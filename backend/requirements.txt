@@ -1,0 +1,7 @@
+iai-gxipy
+matplotlib
+opencv-python
+numpy
+numba
+flask
+flask_cors

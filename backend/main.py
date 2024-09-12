@@ -1,16 +1,39 @@
-# This is a sample Python script.
-
-# Press Umschalt+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Strg+F8 to toggle the breakpoint.
+from camera import Camera
+from frame import Frame
+from SliderWindow import SliderWindow
+from video_reader import FrameGetter
+from Frontend import Frontend
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+print_string = ""
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+cam = Camera()
+slider_configs = [
+    {"name": "Min Blau", "min": 0, "max": 255},
+    {"name": "Max Blau", "min": 0, "max": 255},
+    {"name": "Min Gruen", "min": 0, "max": 255},
+    {"name": "Max Gruen", "min": 0, "max": 255},
+    {"name": "Min Rot", "min": 0, "max": 255},
+    {"name": "Max Rot", "min": 0, "max": 255},
+    {"name": "Expected Lines", "min": 0, "max": 10},
+    {"name": "Filter 1", "min": 0, "max": 20},
+    {"name": "Filter 2", "min": 0, "max": 20},
+    {"name": "Filter 3", "min": 0, "max": 1000},
+    {"name": "Filter 4", "min": 0, "max": 1000}
+]
+
+slider_window = SliderWindow("Custom Sliders", slider_configs)
+
+frame_getter = FrameGetter(r"D:\Videos Burger Wback\video 10.avi")
+frontend = Frontend()
+while True:
+    numpy_image = frame_getter.get_frame()
+    frame = Frame(numpy_image, slider_window.get_slider_values(), 800, 2300)
+    frontend.update_frame(frame)
+
+
+
+
+
+
+
