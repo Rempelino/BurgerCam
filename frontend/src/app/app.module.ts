@@ -24,6 +24,7 @@ import { LiveViewComponent } from './live-view/live-view.component';
 import { SystemSettingsComponent } from './system-settings/system-settings.component';
 import { FilterSettingsComponent } from './filter-settings/filter-settings.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { DoubleSliderComponent } from './double-slider/double-slider.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
     LiveViewComponent,
     SystemSettingsComponent,
     FilterSettingsComponent,
+    DoubleSliderComponent
   ],
   imports: [
     BrowserModule,
