@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiserviceService } from './service';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-live-view',

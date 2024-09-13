@@ -1,8 +1,7 @@
 import cv2
-import sys
 import numpy as np
-from display_image import Display
-from numba import jit
+from settings import SettingsStructure
+
 
 Line_detection_threshold = 0
 
@@ -23,7 +22,9 @@ class Frame:
     black = np.array([np.uint8(0), np.uint8(0), np.uint8(0)])
 
     resize = True
-    def __init__(self, frame, param, y1, y2):
+    def __init__(self, frame, param, y1, y2, settings: SettingsStructure ):
+
+        self.settings = settings
 
         self.frame = frame[y1:y2, :]
 
@@ -35,10 +36,13 @@ class Frame:
 
         self.frame_height, self.frame_width, _ = self.frame.shape
 
-        self.min_color = np.array([param[0], param[2], param[4]])
-        self.max_color = np.array([param[1], param[3], param[5]])
+        self.min_color = np.array([settings.colourFilter.hue.min,
+                                  settings.colourFilter.saturation.min,
+                                  settings.colourFilter.value.min])
+        self.max_color = np.array([settings.colourFilter.hue.max,
+                                   settings.colourFilter.saturation.max,
+                                   settings.colourFilter.value.max])
         self.expected_lines = param[6]
-        self.filter_constant = param[7:11]
         self.line_detection_threshold = Line_detection_threshold
 
     def get_frame(self, with_rows=False, with_level=False, filter=None):
@@ -87,7 +91,7 @@ class Frame:
             diff = np.diff(frame[row], prepend=0, append=0)
             runs = np.where(diff != 0)[0].reshape(-1, 2)
             run_lengths = runs[:, 1] - runs[:, 0]
-            valid_runs = runs[run_lengths > self.filter_constant[0]]
+            valid_runs = runs[run_lengths > self.settings.filter_1]
             for start, end in valid_runs:
                 output[row, start:end] = 255
 
@@ -103,30 +107,12 @@ class Frame:
             diff = np.diff(frame[row], prepend=0, append=0)
             runs = np.where(diff != 0)[0].reshape(-1, 2)
             run_lengths = runs[:, 1] - runs[:, 0]
-            valid_runs = runs[run_lengths > self.filter_constant[1]]
+            valid_runs = runs[run_lengths > self.settings.filter_2]
             for start, end in valid_runs:
                 output[row, start:end] = 255
 
         self.frame_filtered_2 = np.transpose(output)
         return self.frame_filtered_2
-
-    def get_frame_filtered_3_not_used(self, with_rows=False):
-        if self.frame_filtered_3 is not None:
-            if with_rows:
-                frame = self.add_line(self.frame_filtered_3)
-                return frame
-            return self.frame_filtered_3
-
-        frame = self.hsv_to_grayscale(self.get_frame_filtered_2().copy())
-        frame = self.remove_small_objects(frame, self.filter_constant[0])
-        #frame = self.remove_object_below_height(frame, 30)
-        frame = self.remove_small_objects(255 - frame, self.filter_constant[1])
-        frame = 255 - frame
-        frame = self.grayscale_to_hsv(frame)
-        self.frame_filtered_3 = frame
-        if with_rows:
-            frame = self.add_line(frame)
-        return frame
 
     def remove_small_objects(self, image, min_size):
         num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(image, connectivity=8)
@@ -226,7 +212,7 @@ class Frame:
 
         # Put the text on the image
         for line in self.get_lines():
-            text = str(int(line[1]/255/35))
+            text = str(int(line[1] / 255 / self.frame_width * 100)) + "%"
             cv2.putText(frame, text, [0, line[0]], font, font_scale, color, thickness, cv2.LINE_AA)
 
         return frame

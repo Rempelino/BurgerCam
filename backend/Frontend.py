@@ -7,13 +7,17 @@ from threading import Thread
 import cv2
 from frame import Frame
 from urllib.parse import urlparse, parse_qs
+from dacite import from_dict, Config, DaciteError
+from settings import Settings, SettingsStructure
 
 class Frontend:
     frame: Frame = None
     frame_has_changed = False
     streams = []
+    enable_frame_update = True
 
-    def __init__(self):
+    def __init__(self, settings: Settings):
+        self.settings: Settings = settings
         self.is_connected = False
         self.app = Flask(__name__)
         CORS(self.app)
@@ -35,12 +39,28 @@ class Frontend:
         self.app.run(debug=False, threaded=True)
 
     def define_routes(self):
-        @self.app.route('/api/data')
-        def get_data():
-            data = {
-                'msg': 'Burger Cam'
-            }
-            return jsonify(data)
+
+        @self.app.route('/api/settings')
+        def get_settings():
+            if request.method == 'OPTIONS':
+                return '', 200
+            return jsonify(self.settings.get_settings())
+
+        @self.app.route('/api/set_settings', methods=['POST'])
+        def set_settings():
+            data = request.get_json()
+            self.settings.set_settings(from_dict(data_class=SettingsStructure, data=data, config=Config(check_types=False)))
+            return jsonify({'msg': 'got it'})
+
+        @self.app.route('/enableFrameUpdate')
+        def set_enable_frame_update():
+            self.enable_frame_update = True
+            return jsonify({'msg': 'got it'})
+
+        @self.app.route('/disableFrameUpdate')
+        def reset_enable_frame_update():
+            self.enable_frame_update = False
+            return jsonify({'msg': 'got it'})
 
         @self.app.route('/api/action', methods=['POST', 'OPTIONS'])
         def perform_action():
@@ -72,26 +92,23 @@ class Frontend:
             self.set_params(params)
             return jsonify({"msg": "updated settings"})
 
-
-
     def generate_frames(self, ID):
         ts = time.time()
         while True:
-            while time.time() - ts < 0.050:
-                pass
-            ts = time.time()
-            while not self.frame_has_changed:
-                pass
+            #while time.time() - ts < 0.050:
+            #    pass
+            #ts = time.time()
+            #while not self.frame_has_changed:
+            #    pass
             self.frame_has_changed = True
             param = self.get_params(ID)
             frame = self.frame.get_frame(filter=param['filter'],
-                                         with_rows=param['with_rows']=='true',
-                                         with_level=param['with_level']=='true')
+                                         with_rows=param['with_rows'] == 'true',
+                                         with_level=param['with_level'] == 'true')
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
 
     def get_params(self, ID):
         for par in self.streams:

@@ -1,12 +1,14 @@
+import time
+
 from camera import Camera
 from frame import Frame
 from SliderWindow import SliderWindow
 from video_reader import FrameGetter
 from Frontend import Frontend
+from settings import Settings
 
 
 print_string = ""
-
 cam = Camera()
 slider_configs = [
     {"name": "Min Blau", "min": 0, "max": 255},
@@ -22,18 +24,17 @@ slider_configs = [
     {"name": "Filter 4", "min": 0, "max": 1000}
 ]
 
+settings = Settings()
+
 slider_window = SliderWindow("Custom Sliders", slider_configs)
 
 frame_getter = FrameGetter(r"D:\Videos Burger Wback\video 10.avi")
-frontend = Frontend()
+frontend = Frontend(settings)
+
+numpy_image = frame_getter.get_frame()
 while True:
-    numpy_image = frame_getter.get_frame()
-    frame = Frame(numpy_image, slider_window.get_slider_values(), 800, 2300)
+    if frontend.enable_frame_update:
+        numpy_image = frame_getter.get_frame()
+    frame = Frame(numpy_image, slider_window.get_slider_values(), 800, 2300, settings.get_settings())
     frontend.update_frame(frame)
-
-
-
-
-
-
-
+    #time.sleep(1)

@@ -5,3 +5,4 @@ numpy
 numba
 flask
 flask_cors
+dacite
