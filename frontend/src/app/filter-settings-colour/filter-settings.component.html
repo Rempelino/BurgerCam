@@ -1,0 +1,25 @@
+<div *ngIf="isLoading">
+    Loading...
+</div>
+
+<div *ngIf="failedToConnect">
+    Connection to backend failed
+</div>
+
+<div *ngIf="!isLoading&&!failedToConnect&&filterSettings">
+    <app-video-stream [checkBoxLabel]="'Monochrom'"[ID]="'1'"filter="mono" [optionsAvailable]="false"></app-video-stream>
+    <mat-card class="card-style">
+        <mat-card-title>Colour Filter</mat-card-title>
+        <app-double-slider [value1]="filterSettings.hue.min" [value2]="filterSettings.hue.max" label1="Min Hue"
+            label2="Max Hue" (value1Changed)="onHueMinChanged($event)" (value2Changed)="onHueMaxChanged($event)">
+        </app-double-slider>
+        <app-double-slider [value1]="filterSettings.saturation.min" [value2]="filterSettings.saturation.max"
+            label1="Min Saturation" label2="Max Saturation" (value1Changed)="onSatMinChanged($event)"
+            (value2Changed)="onSatMaxChanged($event)">
+        </app-double-slider>
+        <app-double-slider [value1]="filterSettings.value.min" [value2]="filterSettings.value.max" label1="Min Value"
+            label2="Max Value" (value1Changed)="onValueMinChanged($event)" (value2Changed)="onValueMaxChanged($event)">
+        </app-double-slider>
+    </mat-card>
+    <app-video-stream [checkBoxLabel]="'Monochrom'" [ID]="'0'" filter="pixel_counter" [optionsAvailable]="false"></app-video-stream>
+</div>

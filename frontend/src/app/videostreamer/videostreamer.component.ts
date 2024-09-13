@@ -18,12 +18,14 @@ export class VideoStreamComponent implements OnInit {
   @Input() with_rows: boolean = false
   @Input() with_level: boolean = false
   @Input() ID: string = ''
-  
+  @Input() optionsAvailable: boolean = true;
+
   videoUrl: SafeUrl = '';
   isStreamEnabled = true;
   url = ''
+  enableFrameUpdate = true;
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
     console.log(this.checkBoxLabel);
@@ -33,9 +35,9 @@ export class VideoStreamComponent implements OnInit {
   }
 
   onCheckboxChange() {
-    if (this.isStreamEnabled){
+    if (this.isStreamEnabled) {
       this.startStream();
-    }else{
+    } else {
       this.stopStream();
     }
   }
@@ -51,11 +53,20 @@ export class VideoStreamComponent implements OnInit {
   }
 
   private stopStream() {
-      this.url = "";
-      this.updateUrl();
+    this.url = "";
+    this.updateUrl();
   }
 
-  private updateUrl(){
+  onEnableChange(value: boolean) {
+    if (value) {
+      this.url = `http://localhost:5000/enableFrameUpdate`
+    } else {
+      this.url = `http://localhost:5000/disableFrameUpdate`
+    }
+    fetch(this.url)
+  }
+
+  private updateUrl() {
     this.videoUrl = this.sanitizer.bypassSecurityTrustUrl(this.url);
     console.log(`updated url to ${this.url}`)
   }

@@ -4,13 +4,13 @@ mat-slider {
 }
 
 mat-form-field {
-    margin: 2%;
-    width: 46%;
+    margin: 10px;
+    width: 250px;
 }
 
 mat-card {
     display: inline-block;
     margin: 2%;
-    width: 46%;
+    width: 600px;
   }
   
