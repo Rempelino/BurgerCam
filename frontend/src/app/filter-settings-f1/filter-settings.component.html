@@ -10,9 +10,15 @@
     <app-video-stream [checkBoxLabel]="'Monochrom'" [ID]="'1'" filter="filter_1" [optionsAvailable]="false"></app-video-stream>
     <mat-card class="card-style">
         <mat-card-title>Colour Filter</mat-card-title>
+
         <app-double-slider [value1]="settings.filter_1" label1="Filter_value"
             (value1Changed)="onValueChange($event)" [isSingleSlider]="true" [maxValue]="30">
         </app-double-slider>
+
+        <app-double-slider [value1]="settings.gap_filler" label1="Gap filler"
+            (value1Changed)="onGapFillerChange($event)" [isSingleSlider]="true" [maxValue]="2000000">
+        </app-double-slider>
+
     </mat-card>
-    <app-video-stream [checkBoxLabel]="'Monochrom'" [ID]="'0'" filter="pixel_counter" [optionsAvailable]="false"></app-video-stream>
+    <!--app-video-stream [checkBoxLabel]="'Monochrom'" [ID]="'0'" filter="pixel_counter" [optionsAvailable]="false"></app-video-stream-->
 </div>
