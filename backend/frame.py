@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from settings import SettingsStructure
-
+from somefile import segment_burgers_advanced, remove_small_objects, fill_gaps
 
 Line_detection_threshold = 0
 
@@ -22,7 +22,7 @@ class Frame:
     black = np.array([np.uint8(0), np.uint8(0), np.uint8(0)])
 
     resize = True
-    def __init__(self, frame, param, y1, y2, settings: SettingsStructure ):
+    def __init__(self, frame, amount_of_lines, y1, y2, settings: SettingsStructure ):
 
         self.settings = settings
 
@@ -42,7 +42,7 @@ class Frame:
         self.max_color = np.array([settings.colourFilter.hue.max,
                                    settings.colourFilter.saturation.max,
                                    settings.colourFilter.value.max])
-        self.expected_lines = param[6]
+        self.expected_lines = amount_of_lines
         self.line_detection_threshold = Line_detection_threshold
 
     def get_frame(self, with_rows=False, with_level=False, filter=None):
@@ -77,7 +77,6 @@ class Frame:
     def get_frame_monochrom(self):
         if self.frame_monochrom is not None:
             return self.frame_monochrom
-
         new_frame = cv2.cvtColor(self.get_frame(), cv2.COLOR_BGR2HSV) #filter works better when using HSV color coding
         self.frame_monochrom = cv2.inRange(new_frame, self.min_color, self.max_color)
         return self.frame_monochrom
@@ -85,6 +84,13 @@ class Frame:
     def get_frame_filtered_1(self):
         if self.frame_filtered_1 is not None:
             return self.frame_filtered_1
+
+        #test
+        frame = self.get_frame_monochrom()
+        frame = fill_gaps(frame, self.settings.gap_filler)
+        self.frame_filtered_1 = frame#remove_small_objects(frame, 50)
+        return self.frame_filtered_1
+
         frame = self.get_frame_monochrom()
         output = np.zeros_like(frame, dtype=np.uint8)
         for row in range(frame.shape[0]):

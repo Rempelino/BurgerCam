@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { SettingsStructure, ColourFilter } from '../setings-interface';
 import { ApiServiceService } from '../api-service.service';
 import { Router } from '@angular/router'
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-filter-settings-f2',
@@ -16,12 +17,11 @@ export class FilterSettingsF2Component implements OnInit {
 
   constructor(private apiService: ApiServiceService, private router: Router) { }
 
-  ngOnInit(): void {
-    this.apiService.getSettings().subscribe({
-      next: (settings) => {
-        console.log('Raw settings received:', settings);
+  async ngOnInit() {
+    const settings = await firstValueFrom(this.apiService.getSettings());
+    console.log('Raw settings received:', settings);
         if (settings) {
-          this.settings = settings
+          this.settings = settings;
           if (this.settings != null && this.settings.colourFilter) {
             this.filterSettings = this.settings.colourFilter;
             console.log("updated filter settings", this.filterSettings)
@@ -32,14 +32,8 @@ export class FilterSettingsF2Component implements OnInit {
         } else {
           this.failedToConnect = true;
           this.isLoading = false;
-          this.reloadRoute();
+          //this.reloadRoute();
         }
-      },
-      error: (error) => {
-        console.error('Error fetching settings:', error);
-        this.isLoading = false;
-      }
-    });
   }
 
   reloadRoute(): void {

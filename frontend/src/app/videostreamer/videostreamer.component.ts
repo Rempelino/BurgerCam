@@ -43,12 +43,12 @@ export class VideoStreamComponent implements OnInit {
   }
 
   onSettingChange() {
-    this.url = `http://localhost:5000/setting_change?ID=${this.ID}&filter=${this.filter}&with_rows=${this.with_rows}&with_level=${this.with_level}`
+    this.url = `http://localhost:57000/setting_change?ID=${this.ID}&filter=${this.filter}&with_rows=${this.with_rows}&with_level=${this.with_level}`
     fetch(this.url)
   }
 
   private startStream() {
-    this.url = `http://localhost:5000/video_feed?ID=${this.ID}`
+    this.url = `http://localhost:57000/video_feed?ID=${this.ID}`
     this.updateUrl();
   }
 
@@ -59,9 +59,9 @@ export class VideoStreamComponent implements OnInit {
 
   onEnableChange(value: boolean) {
     if (value) {
-      this.url = `http://localhost:5000/enableFrameUpdate`
+      this.url = `http://localhost:57000/enableFrameUpdate`
     } else {
-      this.url = `http://localhost:5000/disableFrameUpdate`
+      this.url = `http://localhost:57000/disableFrameUpdate`
     }
     fetch(this.url)
   }

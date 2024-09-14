@@ -19,6 +19,7 @@ class SettingsStructure:
     colourFilter: ColourFilter
     filter_1: float
     filter_2: float
+    gap_filler: float
 
 
 class Settings:
@@ -40,5 +41,6 @@ class Settings:
                 value=MaxMin(max=255, min=56)
             ),
             filter_1=5,
-            filter_2=5
+            filter_2=5,
+            gap_filler=50
         )

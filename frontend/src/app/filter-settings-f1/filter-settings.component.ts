@@ -32,7 +32,7 @@ export class FilterSettingsF1Component implements OnInit {
         } else {
           this.failedToConnect = true;
           this.isLoading = false;
-          this.reloadRoute();
+          //this.reloadRoute();
         }
       },
       error: (error) => {
@@ -51,6 +51,13 @@ export class FilterSettingsF1Component implements OnInit {
   onValueChange(value: number) {
     if (this.settings) {
       this.settings.filter_1 = value;
+      this.sendDataToBackend();
+    }
+  }
+
+  onGapFillerChange(value: number) {
+    if (this.settings) {
+      this.settings.gap_filler = value;
       this.sendDataToBackend();
     }
   }

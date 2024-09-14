@@ -14,7 +14,7 @@ class Frontend:
     frame: Frame = None
     frame_has_changed = False
     streams = []
-    enable_frame_update = True
+    enable_frame_update = False
 
     def __init__(self, settings: Settings):
         self.settings: Settings = settings
@@ -36,7 +36,7 @@ class Frontend:
         flask_thread.start()
 
     def run_flask(self):
-        self.app.run(debug=False, threaded=True)
+        self.app.run(debug=False, threaded=True, port=57000)
 
     def define_routes(self):
 

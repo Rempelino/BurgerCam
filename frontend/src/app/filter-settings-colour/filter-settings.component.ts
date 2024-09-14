@@ -32,7 +32,7 @@ export class FilterSettingsColorComponent implements OnInit {
         } else {
           this.failedToConnect = true;
           this.isLoading = false;
-          this.reloadRoute();
+          //this.reloadRoute();
         }
       },
       error: (error) => {

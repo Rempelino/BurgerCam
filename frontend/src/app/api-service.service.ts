@@ -8,7 +8,7 @@ import { catchError, tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class ApiServiceService {
-  private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = 'http://localhost:57000/api';
   private settingsSubject = new BehaviorSubject<SettingsStructure | null>(null);
 
   constructor(private http: HttpClient) { 
