@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from queue import Queue
 from datetime import datetime
-from print_debug import print_time, commit_print
+from time_debug import print_time, commit_print
 
 q = Queue(maxsize=1)
 

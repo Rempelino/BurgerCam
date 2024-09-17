@@ -26,7 +26,7 @@ def print_time(msg):
         return
     global time_stamp
     global print_string
-    print_string = f'{print_string}{millis() - time_stamp}ms- {msg}\n'
+    print_string = f'{print_string}{get_time()}ms- {msg}\n'
     time_stamp = millis()
 
 

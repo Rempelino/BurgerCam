@@ -1,10 +1,8 @@
 import cv2
 import numpy as np
-from settings import SettingsStructure
-from somefile import segment_burgers_advanced, remove_small_objects, fill_gaps
+from interface import SettingsStructure
 
 Line_detection_threshold = 0
-
 
 class Frame:
     global Line_detection_threshold
@@ -84,12 +82,6 @@ class Frame:
     def get_frame_filtered_1(self):
         if self.frame_filtered_1 is not None:
             return self.frame_filtered_1
-
-        #test
-        frame = self.get_frame_monochrom()
-        frame = fill_gaps(frame, self.settings.gap_filler)
-        self.frame_filtered_1 = frame#remove_small_objects(frame, 50)
-        return self.frame_filtered_1
 
         frame = self.get_frame_monochrom()
         output = np.zeros_like(frame, dtype=np.uint8)
@@ -184,6 +176,11 @@ class Frame:
             self.get_lines()
 
         return lines
+
+    def get_line_values(self):
+        if self.lines is None:
+            self.get_lines()
+        return [x[1] / 255 / self.frame_width * 100 for x in self.lines]
 
     def add_threshold(self, frame):
         new_frame = frame.copy()

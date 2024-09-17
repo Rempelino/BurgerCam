@@ -7,14 +7,14 @@ from threading import Thread
 import cv2
 from frame import Frame
 from urllib.parse import urlparse, parse_qs
-from dacite import from_dict, Config, DaciteError
-from settings import Settings, SettingsStructure
+from dacite import from_dict, Config
+from interface import Settings, SettingsStructure
 
 class Frontend:
     frame: Frame = None
     frame_has_changed = False
     streams = []
-    enable_frame_update = False
+    enable_frame_update = True
 
     def __init__(self, settings: Settings):
         self.settings: Settings = settings

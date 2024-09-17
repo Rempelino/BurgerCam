@@ -55,13 +55,6 @@ export class FilterSettingsF1Component implements OnInit {
     }
   }
 
-  onGapFillerChange(value: number) {
-    if (this.settings) {
-      this.settings.gap_filler = value;
-      this.sendDataToBackend();
-    }
-  }
-
   sendDataToBackend() {
     this.apiService.setSettings(this.settings).subscribe({
       next: (response) => {

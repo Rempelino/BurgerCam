@@ -2,7 +2,6 @@ export interface SettingsStructure {
     colourFilter: ColourFilter;
     filter_1: number;
     filter_2: number;
-    gap_filler: number;
 }
 
 export interface ColourFilter {
