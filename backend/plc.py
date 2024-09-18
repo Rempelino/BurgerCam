@@ -32,6 +32,7 @@ class PLC:
             if not connected:
                 return None
 
+
         reader, writer = self.socket
         if self.settings.plc_update_request_flag:
             self.send_command = MessageType.SETTINGS
@@ -56,14 +57,24 @@ class PLC:
 
         if self.send_command != MessageType.IDLE:
             data = bytes([self.send_command.value]) + data
-        writer.write(data)
-        await writer.drain()
-        self.send_command = MessageType.IDLE
 
-        self.received_byte_string = await reader.read(1024)
+        try:
+            writer.write(data)
+            await writer.drain()
+            self.send_command = MessageType.IDLE
+
+            self.received_byte_string = await reader.read(1024)
+        except (ConnectionResetError, ConnectionAbortedError) as e:
+            print(f'An error occured while beeing connected: {e}')
+            self.socket = None
+            return
+
         if len(self.received_byte_string) != 0:
             self.process_received_data()
 
+    async def ready_for_new_frame(self):
+        while self.new_line_values_available and self.socket:
+            await asyncio.sleep(0)
 
     async def _wait_for_values(self):
         while not self.new_line_values_available:

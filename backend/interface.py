@@ -1,12 +1,14 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, fields, is_dataclass
 from typing import Union
 from enum import Enum
 import json
+import struct
+
 
 @dataclass
 class MaxMin:
-    max: float
-    min: float
+    max: int
+    min: int
 
 
 @dataclass
@@ -19,41 +21,36 @@ class ColourFilter:
 @dataclass
 class SettingsStructure:
     colourFilter: ColourFilter
-    filter_1: float
-    filter_2: float
+    filter_1: int
+    filter_2: int
+    frame_cutout: MaxMin
 
 
 class Settings:
     plc_update_request_flag = False
+
     def __init__(self):
         self.settings: SettingsStructure = self.get_defaults()
 
     def set_settings(self, settings: Union[SettingsStructure, bytearray]):
+
         # settings changed by frontend
         if isinstance(settings, SettingsStructure):
             self.settings = settings
             self.plc_update_request_flag = True
+
         # settings changed by plc
         else:
-            values = list(settings)
-            self.settings.colourFilter.hue.max = values[0]
-            self.settings.colourFilter.hue.min = values[1]
-            self.settings.colourFilter.saturation.max = values[2]
-            self.settings.colourFilter.saturation.min = values[3]
-            self.settings.colourFilter.value.max = values[4]
-            self.settings.colourFilter.value.min = values[5]
-            self.settings.filter_1 = values[6]
-            self.settings.filter_2 = values[7]
-        print(f"Settings set to: {self.settings}")
+
+            self.settings, _ = self.bytes_to_dict(settings, SettingsStructure, self.settings)
+            print(f'settings updated by PLC: {self.settings}')
+
+
 
     def get_settings(self, as_byte_stream=False):
         if not as_byte_stream:
             return self.settings
-        data = json.dumps(asdict(self.settings)).encode('utf-8')
-        data = self.extract_values_from_json_bytes(data)
-        data = bytes(data)
-        print(f"byte data: {data}")
-        return data
+        return self.dict_to_bytes(asdict(self.settings))
 
     @staticmethod
     def get_defaults() -> SettingsStructure:
@@ -64,32 +61,38 @@ class Settings:
                 value=MaxMin(max=255, min=56)
             ),
             filter_1=5,
-            filter_2=5
+            filter_2=5,
+            frame_cutout=MaxMin(max=2300, min=800)
         )
 
-    @staticmethod
-    def extract_values_from_json_bytes(byte_data):
-        # Decode bytes to string
-        json_str = byte_data.decode('utf-8')
-
-        # Parse JSON
-        data = json.loads(json_str)
-
-        # Extract values
-        values = []
-
-        # Handle nested dictionary
-        for key, value in data.items():
-            if isinstance(value, dict):
-                for sub_key, sub_value in value.items():
-                    if isinstance(sub_value, dict):
-                        values.extend(sub_value.values())
-                    else:
-                        values.append(sub_value)
+    def dict_to_bytes(self, dictionary):
+        bytestream = b''
+        for key, value in dictionary.items():
+            if isinstance(value, int):
+                new_bytes = struct.pack('>h', value)
+                bytestream += new_bytes
+            elif isinstance(value, dict):
+                bytestream += self.dict_to_bytes(value)
             else:
-                values.append(value)
+                print(f"key: {key}, value: {value} is of unsupported type {type(value)} detected")
+        return bytestream
 
-        return values
+    def bytes_to_dict(self, data, data_class, current_settings, index=0):
+
+        new_settings = current_settings
+
+        for field in fields(new_settings):
+            if field.type == int:
+                sub_data = data[index:index + 2]
+                index += 2
+                (new_value,) = struct.unpack('>h', sub_data)
+                setattr(new_settings, field.name, new_value)
+            elif is_dataclass(getattr(new_settings, field.name)):
+                new_value, index = self.bytes_to_dict(data, field.type, getattr(new_settings, field.name), index)
+                setattr(new_settings, field.name, new_value)
+            else:
+                print(f"key: {field.name}, of unsupported type {field.type} detected")
+        return new_settings, index
 
 
 class MessageType(Enum):
@@ -100,3 +103,9 @@ class MessageType(Enum):
     IDLE = 4
     PLC_CONFIRM = 5
 
+
+if __name__ == '__main__':
+    settings = Settings()
+    settings.set_settings(bytearray(b'\x00\x16\x00\x00\x00\xf7\x00B\x00\xff\x008\x00\x05\x00\x05\x08\xfc\x03 '))
+    print(settings.get_settings(as_byte_stream=True))
+    print(settings.get_settings(as_byte_stream=False))

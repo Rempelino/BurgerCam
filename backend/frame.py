@@ -127,7 +127,7 @@ class Frame:
         new_frame = np.zeros([self.frame_height, self.frame_width, 3], dtype=np.uint8)
         for index, pixel_row in enumerate(sum_of_pixels):
             quotient, _ = divmod(pixel_row, 255)
-            new_frame[index, :quotient] = self.white
+            new_frame[index, :int(quotient)] = self.white
 
         if with_rows:
             new_frame = self.add_line(new_frame)

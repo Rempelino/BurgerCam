@@ -3,23 +3,28 @@ from plc import PLC
 from frontend import Frontend
 from interface import Settings
 from imaging import Imaging
+from constants import IP_PLC
 
 
 settings = Settings()
-plc = PLC('192.168.100.1', 2100, settings)
+plc = PLC(IP_PLC, 2100, settings)
 frontend = Frontend(settings)
 imaging = Imaging(settings, plc, frontend)
+
 
 async def image_processing():
     print("started task image processing")
     while True:
+        await asyncio.sleep(0)
         await imaging.run()
 
 
 async def plc_connection():
     print("started Task plc connection")
     while True:
+        await asyncio.sleep(0)
         await plc.listen()
+
 
 async def main():
     tasks = [
