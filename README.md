@@ -6,6 +6,7 @@ This repository contains both the backend (Python) and frontend (Angular) compon
 
 - `/backend`: Contains the Python backend project
 - `/frontend`: Contains the Angular frontend project
+- `/PLC Project`: Contains the binary file for a PLC controller.
 
 ## Setup
 
@@ -24,6 +25,10 @@ This repository contains both the backend (Python) and frontend (Angular) compon
 1. Navigate to the `frontend` directory
 2. Install dependencies: `npm install`
 3. Run the development server: `ng serve`
+
+### PLC Project(Sysmac)
+
+1. The binary can be imported using Sysmac Studio
 
 ## Development
 
