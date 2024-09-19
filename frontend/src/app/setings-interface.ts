@@ -2,6 +2,8 @@ export interface SettingsStructure {
     colourFilter: ColourFilter;
     filter_1: number;
     filter_2: number;
+    frame_cutout: MaxMin;
+    lines: number;
 }
 
 export interface ColourFilter {

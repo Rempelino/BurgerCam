@@ -78,7 +78,6 @@ class Frontend:
         @self.app.route('/video_feed')
         def video_feed():
             ID = request.args.get("ID")
-            print(ID)
             frame = self.generate_frames(ID)
             return Response(frame,
                             mimetype='multipart/x-mixed-replace; boundary=frame')

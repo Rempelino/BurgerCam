@@ -1,7 +1,6 @@
 from dataclasses import dataclass, asdict, fields, is_dataclass
 from typing import Union
 from enum import Enum
-import json
 import struct
 
 
@@ -24,6 +23,7 @@ class SettingsStructure:
     filter_1: int
     filter_2: int
     frame_cutout: MaxMin
+    lines: int
 
 
 class Settings:
@@ -36,21 +36,28 @@ class Settings:
 
         # settings changed by frontend
         if isinstance(settings, SettingsStructure):
-            self.settings = settings
+            self.validate_settings(settings)
             self.plc_update_request_flag = True
 
         # settings changed by plc
         else:
-
-            self.settings, _ = self.bytes_to_dict(settings, SettingsStructure, self.settings)
-            print(f'settings updated by PLC: {self.settings}')
-
-
+            new_settings, _ = self.bytes_to_dict(settings, self.settings)
+            self.validate_settings(new_settings)
 
     def get_settings(self, as_byte_stream=False):
         if not as_byte_stream:
             return self.settings
         return self.dict_to_bytes(asdict(self.settings))
+
+    def validate_settings(self, new_settings: SettingsStructure):
+        self.settings.colourFilter.hue = clamp_max_min(new_settings.colourFilter.hue, 0, 255)
+        self.settings.colourFilter.saturation = clamp_max_min(new_settings.colourFilter.saturation, 0, 255)
+        self.settings.colourFilter.value = clamp_max_min(new_settings.colourFilter.value, 0, 255)
+
+        self.settings.filter_1 = clamp(new_settings.filter_1, 0, 30)
+        self.settings.filter_2 = clamp(new_settings.filter_2, 0, 30)
+
+        self.settings.frame_cutout = clamp_max_min(new_settings.frame_cutout, 0, 3000)
 
     @staticmethod
     def get_defaults() -> SettingsStructure:
@@ -62,7 +69,8 @@ class Settings:
             ),
             filter_1=5,
             filter_2=5,
-            frame_cutout=MaxMin(max=2300, min=800)
+            frame_cutout=MaxMin(max=2300, min=800),
+            lines=6
         )
 
     def dict_to_bytes(self, dictionary):
@@ -77,22 +85,35 @@ class Settings:
                 print(f"key: {key}, value: {value} is of unsupported type {type(value)} detected")
         return bytestream
 
-    def bytes_to_dict(self, data, data_class, current_settings, index=0):
+    def bytes_to_dict(self, data, current_settings, index=0):
 
         new_settings = current_settings
+        try:
+            for field in fields(new_settings):
+                if field.type == int:
+                    sub_data = data[index:index + 2]
+                    index += 2
+                    (new_value,) = struct.unpack('>h', sub_data)
+                    setattr(new_settings, field.name, new_value)
+                elif is_dataclass(getattr(new_settings, field.name)):
+                    new_value, index = self.bytes_to_dict(data, getattr(new_settings, field.name), index)
+                    setattr(new_settings, field.name, new_value)
+                else:
+                    print(f"key: {field.name}, of unsupported type {field.type} detected")
+            return new_settings, index
+        except struct.error as e:
+            print(e)
+            return current_settings, index
 
-        for field in fields(new_settings):
-            if field.type == int:
-                sub_data = data[index:index + 2]
-                index += 2
-                (new_value,) = struct.unpack('>h', sub_data)
-                setattr(new_settings, field.name, new_value)
-            elif is_dataclass(getattr(new_settings, field.name)):
-                new_value, index = self.bytes_to_dict(data, field.type, getattr(new_settings, field.name), index)
-                setattr(new_settings, field.name, new_value)
-            else:
-                print(f"key: {field.name}, of unsupported type {field.type} detected")
-        return new_settings, index
+
+def clamp(n, smallest, largest):
+    return max(smallest, min(n, largest))
+
+
+def clamp_max_min(n: MaxMin, smallest, largest, min_distance=1):
+    n.min = clamp(n.min, smallest, largest - min_distance)
+    n.max = clamp(n.max, n.min + min_distance, largest)
+    return n
 
 
 class MessageType(Enum):

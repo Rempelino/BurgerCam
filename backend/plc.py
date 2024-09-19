@@ -55,8 +55,7 @@ class PLC:
             case MessageType.SETTINGS:
                 data = self.settings.get_settings(as_byte_stream=True)
 
-        if self.send_command != MessageType.IDLE:
-            data = bytes([self.send_command.value]) + data
+        data = bytes([self.send_command.value]) + data
 
         try:
             writer.write(data)
