@@ -161,8 +161,8 @@ class Frame:
         font = cv2.FONT_HERSHEY_SIMPLEX
 
         # Put the text on the image
-        for line in self.lines:
-            text = str(int(line[1] / self.frame_width * 100)) + "%"
+        for index, line in enumerate(self.lines):
+            text = f'{index+1}:{int(line[1])}%'
             cv2.putText(frame, text, [0, line[0]], font, font_scale, color, thickness, cv2.LINE_AA)
 
         return frame

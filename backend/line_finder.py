@@ -6,7 +6,10 @@ class LineFinder:
     lines = None
     frame = None
 
-    def update(self, frame):
+    def update(self, frame, lines):
+        if self.line_count != lines:
+            self.line_count = lines
+            self.create_default()
         self.frame = frame
 
     def get_lines(self):
@@ -23,9 +26,6 @@ class LineFinder:
             self.create_default()
         return [x[1] for x in self.lines]
 
-    def update_line_count(self, line_count):
-        self.line_count = line_count
-
     def update_line_values(self):
         self.lines = [[x[0], self.frame[x[0]]] for x in self.lines]
 
@@ -34,7 +34,6 @@ class LineFinder:
         detected_lines = []
         last_valley = [0, 0]
         last_hill = [0, 0]
-        position = 0
         waiting_for_hill = True
         for index, value in enumerate(self.frame):
             if waiting_for_hill:
@@ -55,62 +54,60 @@ class LineFinder:
             print(f'detected {len(detected_lines)}. Ignoring the smallest one')
             detected_lines = sorted(detected_lines, reverse=True, key=lambda x: self.frame[x])[:self.line_count]
         detected_lines = sorted(detected_lines)
-        # --------------------------------------
-        # --------------------------------------
-        # ab hier ist müll
-        # --------------------------------------
-        # --------------------------------------
-        current_lines = [x[0] for x in self.lines]
-        for index_detected, line in enumerate(detected_lines):
-            for x in range(len(current_lines)):
-                if x < index_detected:
-                    continue
-                index = min(range(len(current_lines) - index_detected),
-                            key=lambda i: abs(current_lines[i + index_detected] - line))
-                if current_lines[index] > line:
-                    current_lines[index] -= 1
-                else:
-                    current_lines[index] += 1
 
+        # test
+        # try:
+        #    detected_lines.pop(1)
+        #    detected_lines.pop(3)
+        #    detected_lines.pop(3)
+        # except IndexError:
+        #    pass
+        # detected_lines[3] = detected_lines[2] + 1
 
+        mapped = self.map_lists([[x, y] for x, y in enumerate([x[0] for x in self.lines])],
+                                [[x, y] for x, y in enumerate(detected_lines)])
+        mapped = [[x['orig_index_old'], x['orig_index_new']] for x in mapped]
 
-        for index, value in enumerate(current_lines):
-            self.lines[index][0] = value
-        print(f'current line poitions{current_lines}, detected lines {len(detected_lines)}')
+        for line in mapped:
+            if self.lines[line[0]][0] > detected_lines[line[1]]:
+                self.lines[line[0]][0] -= 1
+            elif self.lines[line[0]][0] < detected_lines[line[1]]:
+                self.lines[line[0]][0] += 1
+        return self.lines
 
+    def map_lists(self, old_list, new_list):
+        if len(old_list) == 0 or len(new_list) == 0:
+            return []
 
+        new_lines = [{'position': position,
+                      'min': index,
+                      'max': len(old_list) - len(new_list) + index}
+                     for index, position in enumerate(new_list)]
 
+        best_fits = []
+        for index, line in enumerate(new_lines):
+            best_fit = min(range(line['min'], line['max'] + 1),
+                           key=lambda i: abs(old_list[i][1] - new_list[index][1]))
+            best_fits.append({'index_new': index,
+                              'index_old': best_fit,
+                              'orig_index_new': new_list[index][0],
+                              'orig_index_old': old_list[best_fit][0],
+                              'diff': abs(old_list[best_fit][1] - new_list[index][1])})
 
-
-
-
-
-
-
-
-
-
-
-        return
-
-        current_line_positions = [x[0] for x in self.lines]
-        for line in detected_lines:
-            index = min(range(len(current_line_positions)), key=lambda i: abs(current_line_positions[i] - line))
-            if abs(current_line_positions[index] - line) < 20:
-                if current_line_positions[index] > line:
-                    current_line_positions[index] -= 1
-                else:
-                    current_line_positions[index] += 1
-        for index, value in enumerate(current_line_positions):
-            self.lines[index][0] = value
-        print(self.lines)
-
-
-
-
+        best_fits = sorted(best_fits, key=lambda x: x['diff'])
+        defined_item = best_fits[0]
+        upper_old = old_list[:defined_item['index_old']]
+        upper_new = new_list[:defined_item['index_new']]
+        lower_old = old_list[defined_item['index_old'] + 1:]
+        lower_new = new_list[defined_item['index_new'] + 1:]
+        return_value = self.map_lists(upper_old, upper_new) + [defined_item] + self.map_lists(lower_old, lower_new)
+        return return_value
 
     def create_default(self):
-        self.line_count = 6
+        if self.frame is None:
+            return
+        if self.line_count is None:
+            self.line_count = 6
         positions = [int(self.frame.shape[0] / self.line_count * x
                          + (self.frame.shape[0] / self.line_count / 2))
                      for x in range(self.line_count)]
