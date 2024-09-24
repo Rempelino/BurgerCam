@@ -1,9 +1,8 @@
 from frame import Frame
-from video_reader import FrameGetter
+from frame_getter import FrameGetter
 from frontend import Frontend
 from plc import PLC
 from interface import Settings
-import asyncio
 from constants import path_video
 from line_finder import LineFinder
 
@@ -20,8 +19,9 @@ class Imaging:
     async def run(self):
         if self.frontend.enable_frame_update:
             self.numpy_image = self.frame_getter.get_frame()
-        frame = Frame(self.numpy_image, self.settings.get_settings(), self.line_finder.get_lines())
-        self.line_finder.update(frame.get_frame_collapsed(), self.settings.settings.lines)
-        self.frontend.update_frame(frame)
-        self.plc.send_line_values(self.line_finder.get_line_values())
+        if self.numpy_image is not None:
+            frame = Frame(self.numpy_image, self.settings.get_settings(), self.line_finder.get_lines())
+            self.line_finder.update(frame.get_frame_collapsed(), self.settings.settings.lines)
+            self.frontend.update_frame(frame)
+            self.plc.send_line_values(self.line_finder.get_line_values())
         await self.plc.ready_for_new_frame()

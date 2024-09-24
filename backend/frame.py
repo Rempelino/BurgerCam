@@ -26,7 +26,7 @@ class Frame:
     def __init__(self, frame, settings: SettingsStructure, lines):
 
         self.settings = settings
-
+        frame = self.rotate_image(frame, 6)
         self.frame = frame[settings.frame_cutout.min:settings.frame_cutout.max, :]
         if self.resize:
             height, width, _ = self.frame.shape
@@ -148,7 +148,6 @@ class Frame:
         int((self.line_detection_threshold / 255) - 2): int((self.line_detection_threshold / 255) + 2)] = self.yellow
         return new_frame
 
-
     def overlay_number(self, frame):
         if self.lines is None:
             return frame
@@ -166,3 +165,17 @@ class Frame:
             cv2.putText(frame, text, [0, line[0]], font, font_scale, color, thickness, cv2.LINE_AA)
 
         return frame
+
+    @staticmethod
+    def rotate_image(image, angle):
+        # Get the image size
+        height, width = image.shape[:2]
+
+        # Calculate the rotation matrix
+        center = (width / 2, height / 2)
+        rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+
+        # Perform the rotation
+        rotated_image = cv2.warpAffine(image, rotation_matrix, (width, height))
+
+        return rotated_image

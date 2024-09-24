@@ -1,70 +1,56 @@
-import _thread
 import gxipy as gx
 import cv2
 import numpy as np
-from queue import Queue
-from datetime import datetime
-from time_debug import print_time, commit_print
 
-q = Queue(maxsize=1)
 
-class Camera():
+class Camera:
     latest_numpy_image = None
-
+    camera_is_connected = False
+    device_manager = None
+    cam = None
 
     def __init__(self):
-        _thread.start_new_thread(self.live_image, ("live_image", 1, ))
+        self.connect_camera()
+
+    def connect_camera(self):
+        self.device_manager = gx.DeviceManager()
+        dev_num, dev_info_list = self.device_manager.update_device_list()
+        if dev_num == 0:
+            print("no camera connected")
+            return
+        print(f"successfully connected to camera. Vendor: {dev_info_list[0]['vendor_name']}, Device: {dev_info_list[0]['model_name']}, Serial Number: {dev_info_list[0]['sn']}")
+        try:
+            self.cam = self.device_manager.open_device_by_index(1)
+        except gx.InvalidAccess as e:
+            print(f"Camera is already connected to a different application. InvalidAccess exception: {e}")
+            return
+
+        self.cam.TriggerMode.set(gx.GxSwitchEntry.OFF)
+        self.cam.data_stream[0].set_acquisition_buffer_number(1)
+        self.cam.stream_on()
+        self.camera_is_connected = True
 
     def get_frame(self):
-        while self.latest_numpy_image is None:
-            pass
-        if self.latest_numpy_image is not None:
-            temp = self.latest_numpy_image
-            self.latest_numpy_image = None
-            return temp
-        else:
+        if not self.camera_is_connected:
+            self.connect_camera()
             return None
+        raw_image = self.cam.data_stream[0].get_image()
+        if raw_image is None:
+            print("no frame received. Reconnecting camera")
+            self.camera_is_connected = False
+            self.cam.close_device()
+            return None
+        rgb_image = raw_image.convert("RGB")
+        rgb_array = rgb_image.get_numpy_array()
+        numpy_image = cv2.cvtColor(rgb_array, cv2.COLOR_RGB2BGR)
+        return numpy_image
 
-    def live_image(self,threadName, delay):
-        print("livethread")
-        device_manager = gx.DeviceManager()
-        dev_num, dev_info_list = device_manager.update_device_list()
-        if dev_num == 0:
-            print("Number of enumerated devices is 0")
-            return
-        cam = device_manager.open_device_by_index(1)
-        if cam.PixelColorFilter.is_implemented() is False:
-            print("This sample does not support mono camera.")
-            cam.close_device()
-            return
-        cam.TriggerMode.set(gx.GxSwitchEntry.OFF)
-        cam.data_stream[0].set_acquisition_buffer_number(1)
-        cam.stream_on()
-        while True:
-
-            commit_print()
-            print_time("time for commit  print")
-
-            raw_image = cam.data_stream[0].get_image()
-            print_time("got raw image")
-
-            RGB_image = raw_image.convert("RGB")
-            print_time("created RGB image")
-
-            numpy_image = RGB_image.get_numpy_array()
-            print_time("created RGB image")
-
-            while self.latest_numpy_image is not None:
-                pass
-            print_time("wait until frame is read")
-
-            self.latest_numpy_image = numpy_image
-            print_time("put numpy image into takeaway buffer")
-
-
-        # stop data acquisition
-        cam.stream_off()
-
-        # close device
-        cam.close_device()
-        cv2.destroyAllWindows()
+if __name__ == '__main__':
+    print("running")
+    cam = Camera()
+    while True:
+        image = cam.get_frame()
+        if image is not None:
+            image = cv2.resize(image, (800, 400))
+            cv2.imshow('NumPy Image', image)
+            cv2.waitKey(1)
