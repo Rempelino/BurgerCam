@@ -10,11 +10,12 @@ class FrameGetter:
         Initialize the FrameGetter.
         :param video_path: String path to the video file
         """
-        self.video_path = video_path
+
         for index, path in enumerate(video_path):
             self.cap = cv2.VideoCapture(path)
             if self.cap.isOpened():
-                print(f"able to open path{path}")
+                print(f"able to open path {path}")
+                self.video_path = path
                 break
             if index == len(video_path) - 1:
                 print("video could not be opened")
