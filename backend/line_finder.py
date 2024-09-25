@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class LineFinder:
     line_count = None
     lines = None
@@ -54,15 +51,6 @@ class LineFinder:
             print(f'detected {len(detected_lines)}. Ignoring the smallest one')
             detected_lines = sorted(detected_lines, reverse=True, key=lambda x: self.frame[x])[:self.line_count]
         detected_lines = sorted(detected_lines)
-
-        # test
-        # try:
-        #    detected_lines.pop(1)
-        #    detected_lines.pop(3)
-        #    detected_lines.pop(3)
-        # except IndexError:
-        #    pass
-        # detected_lines[3] = detected_lines[2] + 1
 
         mapped = self.map_lists([[x, y] for x, y in enumerate([x[0] for x in self.lines])],
                                 [[x, y] for x, y in enumerate(detected_lines)])

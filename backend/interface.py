@@ -1,6 +1,7 @@
 from dataclasses import dataclass, asdict, fields, is_dataclass
 from typing import Union
 from enum import Enum
+from camera_settings import CamSettings, get_default_cam_settings
 import struct
 
 
@@ -18,16 +19,23 @@ class ColourFilter:
 
 
 @dataclass
+class CameraSettings:
+    ColorTransformationEnable: bool
+
+
+@dataclass
 class SettingsStructure:
     colourFilter: ColourFilter
     filter_1: int
     filter_2: int
     frame_cutout: MaxMin
     lines: int
+    cam_settings: CamSettings
 
 
 class Settings:
     plc_update_request_flag = False
+    cam_update_request_flag = False
 
     def __init__(self):
         self.settings: SettingsStructure = self.get_defaults()
@@ -43,6 +51,7 @@ class Settings:
         else:
             new_settings, _ = self.bytes_to_dict(settings, self.settings)
             self.validate_settings(new_settings)
+        self.cam_update_request_flag = True
 
     def get_settings(self, as_byte_stream=False):
         if not as_byte_stream:
@@ -59,6 +68,9 @@ class Settings:
 
         self.settings.frame_cutout = clamp_max_min(new_settings.frame_cutout, 0, 3000)
 
+    def get_cam_settings(self):
+        return self.settings.cam_settings
+
     @staticmethod
     def get_defaults() -> SettingsStructure:
         return SettingsStructure(
@@ -70,14 +82,21 @@ class Settings:
             filter_1=5,
             filter_2=5,
             frame_cutout=MaxMin(max=2300, min=800),
-            lines=6
+            lines=6,
+            cam_settings=get_default_cam_settings()
         )
 
     def dict_to_bytes(self, dictionary):
         bytestream = b''
         for key, value in dictionary.items():
             if isinstance(value, int):
-                new_bytes = struct.pack('>h', value)
+                new_bytes = struct.pack('<h', value)
+                bytestream += new_bytes
+            if isinstance(value, bool):
+                new_bytes = struct.pack('<?', value)
+                bytestream += new_bytes + b'0'
+            if isinstance(value, float):
+                new_bytes = struct.pack('<f', value)
                 bytestream += new_bytes
             elif isinstance(value, dict):
                 bytestream += self.dict_to_bytes(value)
@@ -86,16 +105,28 @@ class Settings:
         return bytestream
 
     def bytes_to_dict(self, data, current_settings, index=0):
-
         new_settings = current_settings
         try:
             for field in fields(new_settings):
                 if field.type == int:
                     sub_data = data[index:index + 2]
                     index += 2
-                    (new_value,) = struct.unpack('>h', sub_data)
+                    (new_value,) = struct.unpack('<h', sub_data)
+                    setattr(new_settings, field.name, new_value)
+                elif field.type == bool:
+                    sub_data = data[index:index + 1]
+                    index += 2
+                    (new_value,) = struct.unpack('<?', sub_data)
+                    setattr(new_settings, field.name, new_value)
+                elif field.type == float:
+                    sub_data = data[index:index + 4]
+                    index += 4
+                    (new_value,) = struct.unpack('<f', sub_data)
                     setattr(new_settings, field.name, new_value)
                 elif is_dataclass(getattr(new_settings, field.name)):
+                    # make sure that index is dividable by 4
+                    # because data structs in the plc always start every 4th byte
+                    index = index + index % 4
                     new_value, index = self.bytes_to_dict(data, getattr(new_settings, field.name), index)
                     setattr(new_settings, field.name, new_value)
                 else:

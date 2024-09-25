@@ -1,18 +1,21 @@
 import cv2
 import time
 from camera import Camera
+from interface import Settings
+
+
 
 use_camera = True
 class FrameGetter:
     last_frame = None
     frame_counter = 0
-    def __init__(self, video_path):
+    def __init__(self, video_path, settings: Settings):
         """
         Initialize the FrameGetter.
         :param video_path: String path to the video file
         """
         if use_camera:
-            self.cam = Camera()
+            self.cam = Camera(settings)
         else:
             for index, path in enumerate(video_path):
                 self.cap = cv2.VideoCapture(path)

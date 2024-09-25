@@ -94,16 +94,14 @@ class Frontend:
     def generate_frames(self, ID):
         ts = time.time()
         while True:
-            #while time.time() - ts < 0.050:
-            #    pass
-            #ts = time.time()
-            #while not self.frame_has_changed:
-            #    pass
             self.frame_has_changed = True
             param = self.get_params(ID)
-            frame = self.frame.get_frame(filter=param['filter'],
-                                         with_rows=param['with_rows'] == 'true',
-                                         with_level=param['with_level'] == 'true')
+            if self.frame:
+                frame = self.frame.get_frame(filter=param['filter'],
+                                             with_rows=param['with_rows'] == 'true',
+                                             with_level=param['with_level'] == 'true')
+            else:
+                frame = cv2.imread('../Media/noPicAvailable.jpg')
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
             yield (b'--frame\r\n'

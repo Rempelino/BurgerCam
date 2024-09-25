@@ -4,6 +4,10 @@ from frontend import Frontend
 from interface import Settings
 from imaging import Imaging
 from constants import IP_PLC
+import os
+import sys
+import subprocess
+import shutil
 
 
 settings = Settings()
@@ -26,6 +30,17 @@ async def plc_connection():
         await plc.listen()
 
 
+def start_angular_frontend():
+    os.chdir('..')
+    os.chdir("frontend")
+    full_command = f'powershell.exe -Command ng serve'
+    process = subprocess.Popen(full_command,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               shell=True,
+                               creationflags=subprocess.DETACHED_PROCESS)
+
+
 async def main():
     tasks = [
         asyncio.create_task(image_processing()),
@@ -35,4 +50,5 @@ async def main():
 
 
 if __name__ == '__main__':
+    start_angular_frontend()
     asyncio.run(main())
