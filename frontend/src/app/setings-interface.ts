@@ -4,6 +4,7 @@ export interface SettingsStructure {
     filter_2: number;
     frame_cutout: MaxMin;
     lines: number;
+    cam_settings: CamSettings;
 }
 
 export interface ColourFilter {
@@ -15,4 +16,11 @@ export interface ColourFilter {
 export interface MaxMin {
     max: number;
     min: number;
+}
+
+export interface CamSettings{
+    ReverseX: boolean;
+    ReverseY: boolean;
+    ExposureTime: number;
+    ColorTransformationEnable: boolean;
 }

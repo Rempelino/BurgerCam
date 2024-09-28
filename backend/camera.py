@@ -1,7 +1,6 @@
 import gxipy as gx
 import cv2
-from camera_settings import CamSettings
-from interface import Settings
+from interface import Settings, CamSettings
 
 
 class Camera:
@@ -11,7 +10,7 @@ class Camera:
     cam: gx.U3VDevice | None = None
 
     def __init__(self, settings: Settings):
-        self.settings = Settings
+        self.settings = settings
         self.connect_camera()
         # self.read_camera_settings()
         # self.settings = settings
@@ -21,6 +20,7 @@ class Camera:
             return
         settings: CamSettings = self.settings.get_cam_settings()
         settings = self.validate_settings(settings)
+        print(f'writing cam setting: {settings}')
         self.cam.ReverseX.set(settings.ReverseX)
         self.cam.ReverseY.set(settings.ReverseY)
         self.cam.ExposureTime.set(settings.ExposureTime)

@@ -1,33 +1,33 @@
 <mat-sidenav-container class="sidenav-container position-relative">
-    <mat-sidenav #sidenav mode="side" opened fixedInViewport>
-        <mat-nav-list>
-            <a mat-list-item routerLink="/live-view" routerLinkActive="active">
-                <mat-icon>camera icon</mat-icon>
-                Live View
-            </a>
-            <a mat-list-item routerLink="/filter-settings-colour" routerLinkActive="active">
-                <mat-icon>settings_input_component</mat-icon>
-                Filter Settings | Colour
-            </a>
-            <a mat-list-item routerLink="/filter-settings-f1" routerLinkActive="active">
-                <mat-icon>settings_input_component</mat-icon>
-                Filter Settings | Filter 1
-            </a>
-            <a mat-list-item routerLink="/filter-settings-f2" routerLinkActive="active">
-                <mat-icon>settings_input_component</mat-icon>
-                Filter Settings | Filter 2
-            </a>
-            <a mat-list-item routerLink="/cam-settings" routerLinkActive="active">
-                <mat-icon>photo_camera</mat-icon>
-                Camera Settings
-            </a>
-            <a mat-list-item routerLink="/system-settings" routerLinkActive="active">
-                <mat-icon>settings</mat-icon>
-                System Settings
-            </a>
-        </mat-nav-list>
-    </mat-sidenav>
-    <mat-sidenav-content>
-        <router-outlet></router-outlet>
-    </mat-sidenav-content>
+  <mat-sidenav #sidenav mode="side" opened fixedInViewport>
+      <mat-nav-list>
+          <a mat-list-item routerLink="/live-view" routerLinkActive="active">
+              <mat-icon>camera icon</mat-icon>
+              Live View
+          </a>
+          <a mat-list-item routerLink="/filter-settings-colour" routerLinkActive="active">
+              <mat-icon>settings_input_component</mat-icon>
+              Filter Settings | Colour
+          </a>
+          <a mat-list-item routerLink="/filter-settings-f1" routerLinkActive="active">
+              <mat-icon>settings_input_component</mat-icon>
+              Filter Settings | Filter 1
+          </a>
+          <a mat-list-item routerLink="/filter-settings-f2" routerLinkActive="active">
+              <mat-icon>settings_input_component</mat-icon>
+              Filter Settings | Filter 2
+          </a>
+          <a mat-list-item routerLink="/cam-settings" routerLinkActive="active">
+              <mat-icon>photo_camera</mat-icon>
+              Camera Settings
+          </a>
+          <a mat-list-item routerLink="/system-settings" routerLinkActive="active">
+              <mat-icon>settings</mat-icon>
+              System Settings
+          </a>
+      </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+      <router-outlet></router-outlet>
+  </mat-sidenav-content>
 </mat-sidenav-container>

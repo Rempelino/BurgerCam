@@ -26,7 +26,7 @@ class Frame:
     def __init__(self, frame, settings: SettingsStructure, lines):
 
         self.settings = settings
-        frame = self.rotate_image(frame, 6)
+        # frame = self.rotate_image(frame, 6)
         self.frame = frame[settings.frame_cutout.min:settings.frame_cutout.max, :]
         if self.resize:
             height, width, _ = self.frame.shape

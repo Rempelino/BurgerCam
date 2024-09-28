@@ -1,36 +1,39 @@
-from dataclasses import dataclass, asdict, fields, is_dataclass
+from dataclasses import dataclass, asdict, fields, is_dataclass, field
 from typing import Union
 from enum import Enum
-from camera_settings import CamSettings, get_default_cam_settings
+#from camera_settings import CamSettings, get_default_cam_settings
 import struct
 
 
 @dataclass
+class CamSettings:
+    ReverseX: bool = False
+    ReverseY: bool = False
+    ExposureTime: float = 0.0
+    ColorTransformationEnable: bool = False
+
+
+@dataclass
 class MaxMin:
-    max: int
-    min: int
+    max: int = 0
+    min: int = 0
 
 
 @dataclass
 class ColourFilter:
-    hue: MaxMin
-    saturation: MaxMin
-    value: MaxMin
-
-
-@dataclass
-class CameraSettings:
-    ColorTransformationEnable: bool
+    hue: MaxMin = field(default_factory=MaxMin)
+    saturation: MaxMin = field(default_factory=MaxMin)
+    value: MaxMin = field(default_factory=MaxMin)
 
 
 @dataclass
 class SettingsStructure:
-    colourFilter: ColourFilter
-    filter_1: int
-    filter_2: int
-    frame_cutout: MaxMin
-    lines: int
-    cam_settings: CamSettings
+    colourFilter: ColourFilter = field(default_factory=ColourFilter)
+    filter_1: int = 0
+    filter_2: int = 0
+    frame_cutout: MaxMin = field(default_factory=MaxMin)
+    lines: int = 0
+    cam_settings: CamSettings = field(default_factory=CamSettings)
 
 
 class Settings:
@@ -38,10 +41,11 @@ class Settings:
     cam_update_request_flag = False
 
     def __init__(self):
-        self.settings: SettingsStructure = self.get_defaults()
+        self.settings: SettingsStructure = SettingsStructure()
+        self.validate_settings(self.settings)
 
     def set_settings(self, settings: Union[SettingsStructure, bytearray]):
-
+        print(f"setting settings to {settings}")
         # settings changed by frontend
         if isinstance(settings, SettingsStructure):
             self.validate_settings(settings)
@@ -59,6 +63,7 @@ class Settings:
         return self.dict_to_bytes(asdict(self.settings))
 
     def validate_settings(self, new_settings: SettingsStructure):
+        self.settings = new_settings
         self.settings.colourFilter.hue = clamp_max_min(new_settings.colourFilter.hue, 0, 255)
         self.settings.colourFilter.saturation = clamp_max_min(new_settings.colourFilter.saturation, 0, 255)
         self.settings.colourFilter.value = clamp_max_min(new_settings.colourFilter.value, 0, 255)
@@ -71,34 +76,23 @@ class Settings:
     def get_cam_settings(self):
         return self.settings.cam_settings
 
-    @staticmethod
-    def get_defaults() -> SettingsStructure:
-        return SettingsStructure(
-            colourFilter=ColourFilter(
-                hue=MaxMin(max=22, min=0),
-                saturation=MaxMin(max=247, min=66),
-                value=MaxMin(max=255, min=56)
-            ),
-            filter_1=5,
-            filter_2=5,
-            frame_cutout=MaxMin(max=2300, min=800),
-            lines=6,
-            cam_settings=get_default_cam_settings()
-        )
-
     def dict_to_bytes(self, dictionary):
         bytestream = b''
         for key, value in dictionary.items():
             if isinstance(value, int):
                 new_bytes = struct.pack('<h', value)
                 bytestream += new_bytes
-            if isinstance(value, bool):
+            elif isinstance(value, bool):
                 new_bytes = struct.pack('<?', value)
                 bytestream += new_bytes + b'0'
-            if isinstance(value, float):
+
+            elif isinstance(value, float):
                 new_bytes = struct.pack('<f', value)
                 bytestream += new_bytes
             elif isinstance(value, dict):
+                # every structure starts at a byte dividable by 4
+                while len(bytestream) % 4 != 0:
+                    bytestream += b'0'
                 bytestream += self.dict_to_bytes(value)
             else:
                 print(f"key: {key}, value: {value} is of unsupported type {type(value)} detected")

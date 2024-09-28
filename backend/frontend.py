@@ -1,14 +1,16 @@
-import sys
 import time
+from threading import Thread
+from typing import Union
+from urllib.parse import urlparse, parse_qs
 
+import cv2
+from dacite import from_dict, Config
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
-from threading import Thread
-import cv2
+
 from frame import Frame
-from urllib.parse import urlparse, parse_qs
-from dacite import from_dict, Config
 from interface import Settings, SettingsStructure
+
 
 class Frontend:
     frame: Frame = None
@@ -48,8 +50,11 @@ class Frontend:
 
         @self.app.route('/api/set_settings', methods=['POST'])
         def set_settings():
+            def float_hook(value: Union[int, float]) -> float:
+                return float(value)
             data = request.get_json()
-            self.settings.set_settings(from_dict(data_class=SettingsStructure, data=data, config=Config(check_types=False)))
+            self.settings.set_settings(
+                from_dict(data_class=SettingsStructure, data=data, config=Config(type_hooks={float: float_hook})))
             return jsonify({'msg': 'got it'})
 
         @self.app.route('/enableFrameUpdate')

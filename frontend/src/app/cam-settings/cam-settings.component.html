@@ -1,0 +1,16 @@
+<div *ngIf="failedToConnect">
+    Connection to backend failed
+</div>
+
+<div *ngIf="!failedToConnect&&settings">
+    <app-video-streamer [checkBoxLabel]="'raw video'" [ID]="'1'" [optionsAvailable]="false"></app-video-streamer>
+    <mat-card class="card-style">
+        <mat-card-title>Colour Filter</mat-card-title>
+        <app-double-slider [value1]="settings.cam_settings.ExposureTime" label1="Exposure Time" (value1Changed)="onExpoTimeChange($event)"
+            [isSingleSlider]="true" [minValue]="10000" [maxValue]="100000">
+        </app-double-slider>
+        <mat-checkbox [(ngModel)]="settings.cam_settings.ReverseX" (change)="sendDataToBackend()">Reverse X</mat-checkbox>
+        <mat-checkbox [(ngModel)]="settings.cam_settings.ReverseY" (change)="sendDataToBackend()">Reverse Y</mat-checkbox>
+        <mat-checkbox [(ngModel)]="settings.cam_settings.ColorTransformationEnable" (change)="sendDataToBackend()">Enable Color Transformation</mat-checkbox>
+    </mat-card>
+</div>
