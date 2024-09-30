@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/henry/BurgerCam/Production/run.sh
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=BurgerCam
+Name=BurgerCam
+Comment[en_US]=Start BurgerCam services
+Comment=Start BurgerCam services
