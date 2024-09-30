@@ -30,32 +30,6 @@ async def plc_connection():
         await plc.listen()
 
 
-def start_angular_frontend_windows():
-    os.chdir('..')
-    os.chdir("frontend")
-    full_command = f'powershell.exe -Command ng serve'
-    process = subprocess.Popen(full_command,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               shell=True,
-                               creationflags=subprocess.DETACHED_PROCESS)
-
-
-def start_angular_frontend_linux():
-    os.chdir('..')
-    os.chdir("/home/henry/BurgerCam/frontend")
-    command = 'ng serve'
-    process = subprocess.Popen(command,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               shell=True,
-                               preexec_fn=os.setsid)  # This creates a new session, detaching the process
-    process.stdout.close()
-    process.stderr.close()
-    print(f"Angular frontend started with PID: {process.pid}")
-    return process
-
-
 async def main():
     tasks = [
         asyncio.create_task(image_processing()),
@@ -65,9 +39,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    print("testupdate")
-    #if sys.platform.startswith('win'):
-    #    start_angular_frontend_windows()
-    #else:
-    #    start_angular_frontend_linux()
     asyncio.run(main())
