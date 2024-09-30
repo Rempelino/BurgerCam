@@ -42,6 +42,8 @@ class Settings:
 
     def __init__(self):
         self.settings: SettingsStructure = SettingsStructure()
+        self.settings.frame_cutout.min = 800
+        self.settings.frame_cutout.max = 2300
         self.validate_settings(self.settings)
 
     def set_settings(self, settings: Union[SettingsStructure, bytearray]):
