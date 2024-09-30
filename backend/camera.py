@@ -49,8 +49,9 @@ class Camera:
             print(f"Camera is already connected to a different application. InvalidAccess exception: {e}")
             return
 
-        self.cam.TriggerMode.set(gx.GxSwitchEntry.OFF)
-        self.cam.data_stream[0].set_acquisition_buffer_number(1)
+        self.cam.TriggerMode.set(gx.GxSwitchEntry.ON)
+        self.cam.TriggerSource.set(gx.GxTriggerSourceEntry.SOFTWARE)
+        # self.cam.data_stream[0].set_acquisition_buffer_number(1)
         self.cam.stream_on()
         self.write_settings()
         self.camera_is_connected = True
@@ -63,6 +64,7 @@ class Camera:
         if self.settings.cam_update_request_flag:
             self.write_settings()
 
+        self.cam.TriggerSoftware.send_command()
         raw_image = self.cam.data_stream[0].get_image()
         if raw_image is None:
             print("no frame received. Reconnecting camera")
