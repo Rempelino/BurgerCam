@@ -43,7 +43,7 @@ def start_angular_frontend_windows():
 
 def start_angular_frontend_linux():
     os.chdir('..')
-    os.chdir("frontend")
+    os.chdir("/home/henry/BurgerCam/frontend")
     command = 'ng serve'
     process = subprocess.Popen(command,
                                stdout=subprocess.PIPE,
