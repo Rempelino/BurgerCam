@@ -16,7 +16,7 @@ import { DoubleSliderComponent } from "../double-slider/double-slider.component"
     MatCard,
     MatCardTitle,
     DoubleSliderComponent
-    ],
+  ],
   templateUrl: './filter-settings-colour.component.html',
   styleUrl: './filter-settings-colour.component.css'
 })
@@ -27,15 +27,16 @@ export class FilterSettingsColourComponent {
   constructor(private apiService: ApiServiceService) { }
 
   async ngOnInit() {
+    this.failedToConnect = true;
     const settings = await firstValueFrom(this.apiService.getSettings());
-    console.log('Raw settings received:', settings);
-        if (settings) {
-          this.settings = settings;
-          console.log('Settings updated:', settings);
-          this.failedToConnect = false;
-        } else {
-          this.failedToConnect = true;
-        }
+    if (settings) {
+      console.log("received settings", settings);
+      this.settings = settings;
+      this.failedToConnect = false;
+    } else {
+      this.failedToConnect = true;
+      console.log("failed to retrieve data from backend!")
+    }
   }
 
   onHueMinChanged(value: number) {

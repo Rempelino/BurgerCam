@@ -30,21 +30,35 @@ export class CamSettingsComponent {
   constructor(private apiService: ApiServiceService) { }
 
   async ngOnInit() {
+    this.failedToConnect = true;
     const settings = await firstValueFrom(this.apiService.getSettings());
-    console.log(this.settings)
-    console.log('Raw settings received:', settings);
     if (settings) {
+      console.log("received settings", settings);
       this.settings = settings;
-      console.log('Settings updated:', settings);
       this.failedToConnect = false;
     } else {
       this.failedToConnect = true;
+      console.log("failed to retrieve data from backend!")
     }
   }
 
   onExpoTimeChange(value: number) {
     if (this.settings) {
       this.settings.cam_settings.ExposureTime = value;
+      this.sendDataToBackend();
+    }
+  }
+
+  onCutOutMinChanged(value: number) {
+    if (this.settings) {
+      this.settings.frame_cutout.min = value;
+      this.sendDataToBackend();
+    }
+  }
+
+  onCutOutMaxChanged(value: number) {
+    if (this.settings) {
+      this.settings.frame_cutout.max = value;
       this.sendDataToBackend();
     }
   }

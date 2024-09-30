@@ -69,6 +69,5 @@ export class VideoStreamComponent implements OnInit {
 
   private updateUrl() {
     this.videoUrl = this.sanitizer.bypassSecurityTrustUrl(this.url);
-    console.log(`updated url to ${this.url}`)
   }
 }
