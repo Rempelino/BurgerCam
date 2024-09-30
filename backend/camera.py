@@ -1,6 +1,7 @@
 import gxipy as gx
 import cv2
 from interface import Settings, CamSettings
+from time import sleep
 
 
 class Camera:
@@ -37,7 +38,11 @@ class Camera:
 
     def connect_camera(self):
         self.device_manager = gx.DeviceManager()
-        dev_num, dev_info_list = self.device_manager.update_device_list()
+        try:
+            dev_num, dev_info_list = self.device_manager.update_device_list()
+        except gx.NeedMoreBuffer:
+            print("Please remove other USB devices to connect to camera")
+            return
         if dev_num == 0:
             print("no camera connected")
             return
