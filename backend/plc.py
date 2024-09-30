@@ -68,7 +68,9 @@ class PLC:
             self.socket = None
             return
         except ConnectionAbortedError as e:
-            print(f'ConnectionAbortedError: {e} -> continuing connection')
+            print(f'ConnectionAbortedError: {e} -> closing connection to PLC')
+            self.socket = None
+            return
 
         if len(self.received_byte_string) != 0:
             self.process_received_data()

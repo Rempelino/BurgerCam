@@ -53,6 +53,9 @@ class Camera:
         except gx.InvalidAccess as e:
             print(f"Camera is already connected to a different application. InvalidAccess exception: {e}")
             return
+        except gx.OffLine:
+            print("Camera disconnected")
+            return
 
         self.cam.TriggerMode.set(gx.GxSwitchEntry.ON)
         self.cam.TriggerSource.set(gx.GxTriggerSourceEntry.SOFTWARE)

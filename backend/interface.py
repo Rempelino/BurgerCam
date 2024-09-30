@@ -73,7 +73,7 @@ class Settings:
         self.settings.filter_1 = clamp(new_settings.filter_1, 0, 30)
         self.settings.filter_2 = clamp(new_settings.filter_2, 0, 30)
 
-        self.settings.frame_cutout = clamp_max_min(new_settings.frame_cutout, 0, 3000)
+        self.settings.frame_cutout = clamp_max_min(new_settings.frame_cutout, 0, 4096)
 
     def get_cam_settings(self):
         return self.settings.cam_settings

@@ -10,6 +10,7 @@ from flask_cors import CORS
 
 from frame import Frame
 from interface import Settings, SettingsStructure
+import logging
 
 
 class Frontend:
@@ -19,6 +20,8 @@ class Frontend:
     enable_frame_update = True
 
     def __init__(self, settings: Settings):
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.WARNING)
         self.settings: Settings = settings
         self.is_connected = False
         self.app = Flask(__name__)
@@ -46,6 +49,7 @@ class Frontend:
         def get_settings():
             if request.method == 'OPTIONS':
                 return '', 200
+            print(f"sending settings: {self.settings.get_settings()}")
             return jsonify(self.settings.get_settings())
 
         @self.app.route('/api/set_settings', methods=['POST'])

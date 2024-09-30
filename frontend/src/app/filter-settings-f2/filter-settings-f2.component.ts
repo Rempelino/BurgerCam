@@ -30,19 +30,18 @@ export class FilterSettingsF2Component {
 
   async ngOnInit() {
     const settings = await firstValueFrom(this.apiService.getSettings());
-    console.log('Raw settings received:', settings);
     if (settings) {
       this.settings = settings;
-      console.log('Settings updated:', settings);
       this.failedToConnect = false;
     } else {
       this.failedToConnect = true;
+      console.log("failed to retrieve data from backend!")
     }
   }
 
   onValueChange(value: number) {
     if (this.settings) {
-      this.settings.filter_1 = value;
+      this.settings.filter_2 = value;
       this.sendDataToBackend();
     }
   }

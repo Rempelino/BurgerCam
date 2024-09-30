@@ -6,7 +6,7 @@
     <app-video-streamer [checkBoxLabel]="'Monochrom'" [ID]="'1'" filter="filter_1" [optionsAvailable]="false"></app-video-streamer>
     <mat-card class="card-style">
         <mat-card-title>Filter 2</mat-card-title>
-        <app-double-slider [value1]="settings.filter_1" label1="Filter_value"
+        <app-double-slider [value1]="settings.filter_2" label1="Filter_value"
             (value1Changed)="onValueChange($event)" [isSingleSlider]="true" [maxValue]="30">
         </app-double-slider>
     </mat-card>
