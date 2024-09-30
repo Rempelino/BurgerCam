@@ -65,8 +65,8 @@ async def main():
 
 
 if __name__ == '__main__':
-    if sys.platform.startswith('win'):
-        start_angular_frontend_windows()
-    else:
-        start_angular_frontend_linux()
+    #if sys.platform.startswith('win'):
+    #    start_angular_frontend_windows()
+    #else:
+    #    start_angular_frontend_linux()
     asyncio.run(main())
