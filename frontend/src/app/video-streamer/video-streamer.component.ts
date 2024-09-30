@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OnInit, ElementRef, Input, ViewChild } from '@angular/core';
 import { SafeUrl, DomSanitizer } from '@angular/platform-browser';
+import { environment } from '../../enviroments/enviroment';
 
 
 @Component({
@@ -44,12 +45,12 @@ export class VideoStreamComponent implements OnInit {
   }
 
   onSettingChange() {
-    this.url = `http://localhost:57000/setting_change?ID=${this.ID}&filter=${this.filter}&with_rows=${this.with_rows}&with_level=${this.with_level}`
+    this.url = environment.apiUrl + `/setting_change?ID=${this.ID}&filter=${this.filter}&with_rows=${this.with_rows}&with_level=${this.with_level}`
     fetch(this.url)
   }
 
   private startStream() {
-    this.url = `http://localhost:57000/video_feed?ID=${this.ID}`
+    this.url = environment.apiUrl + `/video_feed?ID=${this.ID}`
     this.updateUrl();
   }
 
@@ -60,9 +61,9 @@ export class VideoStreamComponent implements OnInit {
 
   onEnableChange(value: boolean) {
     if (value) {
-      this.url = `http://localhost:57000/enableFrameUpdate`
+      this.url = environment.apiUrl + `/enableFrameUpdate`
     } else {
-      this.url = `http://localhost:57000/disableFrameUpdate`
+      this.url = environment.apiUrl + `/disableFrameUpdate`
     }
     fetch(this.url)
   }

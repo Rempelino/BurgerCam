@@ -9,7 +9,7 @@ import { environment } from '../enviroments/enviroment';
   providedIn: 'root'
 })
 export class ApiServiceService {
-  private apiUrl = environment.apiUrl;
+  private apiUrl = environment.apiUrl + '/api';
   private settingsSubject = new BehaviorSubject<SettingsStructure | null>(null);
 
   constructor(private http: HttpClient) { 
