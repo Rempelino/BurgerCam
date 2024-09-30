@@ -65,6 +65,7 @@ async def main():
 
 
 if __name__ == '__main__':
+    print("testupdate")
     #if sys.platform.startswith('win'):
     #    start_angular_frontend_windows()
     #else:
