@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { SettingsStructure } from './setings-interface';
 import { catchError, tap } from 'rxjs/operators';
+import { environment } from '../enviroments/enviroment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiServiceService {
-  private apiUrl = 'http://localhost:57000/api';
+  private apiUrl = environment.apiUrl;
   private settingsSubject = new BehaviorSubject<SettingsStructure | null>(null);
 
   constructor(private http: HttpClient) { 

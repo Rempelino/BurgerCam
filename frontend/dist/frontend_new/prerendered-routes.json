@@ -1,0 +1,10 @@
+{
+  "routes": [
+    "/cam-settings",
+    "/filter-settings-colour",
+    "/filter-settings-f1",
+    "/filter-settings-f2",
+    "/live-view",
+    "/system-settings"
+  ]
+}

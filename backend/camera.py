@@ -56,7 +56,6 @@ class Camera:
         except gx.OffLine:
             print("Camera disconnected")
             return
-
         self.cam.TriggerMode.set(gx.GxSwitchEntry.ON)
         self.cam.TriggerSource.set(gx.GxTriggerSourceEntry.SOFTWARE)
         # self.cam.data_stream[0].set_acquisition_buffer_number(1)
@@ -72,7 +71,15 @@ class Camera:
         if self.settings.cam_update_request_flag:
             self.write_settings()
 
-        self.cam.TriggerSoftware.send_command()
+        # send command to camera to extract one frame
+        try:
+            self.cam.TriggerSoftware.send_command()
+        except gx.OffLine:
+            print("camera disconnected")
+            self.connect_camera()
+            return None
+
+        # retrieve the frame
         raw_image = self.cam.data_stream[0].get_image()
         if raw_image is None:
             print("no frame received. Reconnecting camera")
