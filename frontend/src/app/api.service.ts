@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
 import { SettingsStructure } from './setings-interface';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, tap, switchMap } from 'rxjs/operators';
 import { environment } from '../enviroments/enviroment';
 
 @Injectable({
@@ -11,30 +11,41 @@ import { environment } from '../enviroments/enviroment';
 export class ApiServiceService {
   private apiUrl = environment.apiUrl + '/api';
   private settingsSubject = new BehaviorSubject<SettingsStructure | null>(null);
+  private fetchingSettings = false;
 
   constructor(private http: HttpClient) { 
     this.initialize();
   }
 
   private initialize(): void {
-    this.fetchSettingsFromBackend();
+    this.fetchSettingsFromBackend().subscribe();
   }
 
   public getSettings(): Observable<SettingsStructure | null> {
-    this.fetchSettingsFromBackend();
+    if (this.settingsSubject.getValue() === null && !this.fetchingSettings) {
+      return this.fetchSettingsFromBackend();
+    }
     return this.settingsSubject.asObservable();
   }
 
-  private fetchSettingsFromBackend(): void {
-    this.http.get<SettingsStructure>(`${this.apiUrl}/settings`).subscribe({
-      next: (data) => {
+  private fetchSettingsFromBackend(): Observable<SettingsStructure | null> {
+    if (this.fetchingSettings) {
+      return this.settingsSubject.asObservable();
+    }
+    
+    this.fetchingSettings = true;
+    return this.http.get<SettingsStructure>(`${this.apiUrl}/settings`).pipe(
+      tap(data => {
         this.settingsSubject.next(data);
-      },
-      error: (error) => {
-        this.settingsSubject.next(null);
+        this.fetchingSettings = false;
+      }),
+      catchError(error => {
         console.error('Error fetching settings:', error);
-      }
-    });
+        this.settingsSubject.next(null);
+        this.fetchingSettings = false;
+        return of(null);
+      })
+    );
   }
 
   public setSettings(settings: SettingsStructure): Observable<any> {

@@ -27,7 +27,7 @@ class LineFinder:
         self.lines = [[x[0], self.frame[x[0]]] for x in self.lines]
 
     def update_line_positions(self):
-        filter_constant = 10
+        filter_constant = 3 # in %
         detected_lines = []
         last_valley = [0, 0]
         last_hill = [0, 0]
@@ -50,6 +50,8 @@ class LineFinder:
         if len(detected_lines) > self.line_count:
             print(f'detected {len(detected_lines)}. Ignoring the smallest one')
             detected_lines = sorted(detected_lines, reverse=True, key=lambda x: self.frame[x])[:self.line_count]
+        else:
+            print(f'detected {len(detected_lines)} from {self.line_count} lines')
         detected_lines = sorted(detected_lines)
 
         mapped = self.map_lists([[x, y] for x, y in enumerate([x[0] for x in self.lines])],

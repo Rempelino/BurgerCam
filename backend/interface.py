@@ -1,7 +1,7 @@
 from dataclasses import dataclass, asdict, fields, is_dataclass, field
 from typing import Union
 from enum import Enum
-#from camera_settings import CamSettings, get_default_cam_settings
+from save_settings import write_dataclass_to_file, read_dataclass_from_file
 import struct
 
 
@@ -42,8 +42,9 @@ class Settings:
 
     def __init__(self):
         self.settings: SettingsStructure = SettingsStructure()
-        self.settings.frame_cutout.min = 800
-        self.settings.frame_cutout.max = 2300
+        settings = read_dataclass_from_file(SettingsStructure, 'settings_save.pkl')
+        if settings is not None:
+            self.settings = settings
         self.validate_settings(self.settings)
 
     def set_settings(self, settings: Union[SettingsStructure, bytearray]):
@@ -57,6 +58,7 @@ class Settings:
         else:
             new_settings, _ = self.bytes_to_dict(settings, self.settings)
             self.validate_settings(new_settings)
+        write_dataclass_to_file(self.settings, 'settings_save.pkl')
         self.cam_update_request_flag = True
 
     def get_settings(self, as_byte_stream=False):
