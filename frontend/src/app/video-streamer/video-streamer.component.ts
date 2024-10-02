@@ -28,10 +28,14 @@ export class VideoStreamComponent implements OnInit {
   isStreamEnabled = true;
   url = ''
   enableFrameUpdate = true;
+  disable_component = true;
 
   constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
+    if (this.disable_component){
+      return;
+    }
     this.onCheckboxChange();
     this.onSettingChange();
   }
