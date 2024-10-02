@@ -19,6 +19,7 @@ class PLC:
         try:
             reader, writer = await asyncio.open_connection(self.host, self.port)
             self.socket = (reader, writer)
+            self.settings.set_PLC_connection_state(True)
             print("Connected")
             return True
         except Exception as e:
@@ -66,11 +67,19 @@ class PLC:
         except ConnectionResetError as e:
             print(f'ConnectionResetError: {e} -> closing connection to PLC')
             self.socket = None
+            self.settings.set_PLC_connection_state(False)
             return
         except ConnectionAbortedError as e:
             print(f'ConnectionAbortedError: {e} -> closing connection to PLC')
             self.socket = None
+            self.settings.set_PLC_connection_state(False)
             return
+        except OSError as e:
+            print(f'OSError: {e} -> Timeout - closing connection to PLC')
+            self.socket = None
+            self.settings.set_PLC_connection_state(False)
+            return
+
 
         if len(self.received_byte_string) != 0:
             self.process_received_data()

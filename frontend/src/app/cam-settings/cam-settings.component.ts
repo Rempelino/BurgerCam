@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { VideoStreamComponent } from '../video-streamer/video-streamer.component';
 import { DoubleSliderComponent } from '../double-slider/double-slider.component';
-import { SettingsStructure } from '../setings-interface';
+import { SettingsStructure } from '../app.interface';
 import { firstValueFrom, interval, Subscription } from 'rxjs';
 import { ApiServiceService } from '../api.service';
 import { MatCard, MatCardTitle } from '@angular/material/card';
@@ -52,6 +52,25 @@ export class CamSettingsComponent {
     }
   }
 
+  private startReconnection() {
+    this.failedToConnect = true;
+    if (!this.reconnectSubscription) {
+      this.reconnectSubscription = interval(5000).subscribe(() => {
+        if (this.failedToConnect) {
+          this.connectToBackend();
+        }
+      });
+    }
+  }
+
+  private stopReconnection() {
+    this.failedToConnect = false;
+    if (this.reconnectSubscription) {
+      this.reconnectSubscription.unsubscribe();
+      this.reconnectSubscription = null;
+    }
+  }
+
   onExpoTimeChange(value: number) {
     if (this.settings) {
       this.settings.cam_settings.ExposureTime = value;
@@ -81,22 +100,5 @@ export class CamSettingsComponent {
     });
   }
 
-  private startReconnection() {
-    this.failedToConnect = true;
-    if (!this.reconnectSubscription) {
-      this.reconnectSubscription = interval(5000).subscribe(() => {
-        if (this.failedToConnect) {
-          this.connectToBackend();
-        }
-      });
-    }
-  }
 
-  private stopReconnection() {
-    this.failedToConnect = false;
-    if (this.reconnectSubscription) {
-      this.reconnectSubscription.unsubscribe();
-      this.reconnectSubscription = null;
-    }
-  }
 }

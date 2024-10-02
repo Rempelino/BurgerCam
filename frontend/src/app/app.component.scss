@@ -1,0 +1,51 @@
+@use '../styles.scss' as gs;
+
+.status-bar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.status-item-OK, .status-item-FAIL {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.status-item-OK {
+    background-color: #32a852;
+}
+
+.status-item-FAIL {
+    background-color: #c72222;
+}
+
+mat-sidenav {
+    color: #4287f5;
+    background-color: gs.$gray;
+    border-color: gs.$tourquise;
+    border-radius: 0%;
+}
+
+mat-nav-list {
+    border-color: gs.$gray;
+    border-radius: 0%;
+}
+
+mat-list-item{
+    border-radius: 0%;
+}
+
+.a {
+    color: red;
+    background-color: gs.$tourquise;
+    border-radius: 0% !important;
+    border-width: 1px !important;
+}
+
+.hr {
+    background-color: gs.$gray;
+    height: 1px;
+    border: none;
+}

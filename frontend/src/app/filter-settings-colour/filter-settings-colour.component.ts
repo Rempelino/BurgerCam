@@ -3,7 +3,7 @@ import { VideoStreamComponent } from '../video-streamer/video-streamer.component
 import { CommonModule } from '@angular/common';
 import { ApiServiceService } from '../api.service';
 import { firstValueFrom } from 'rxjs';
-import { SettingsStructure } from '../setings-interface';
+import { SettingsStructure } from '../app.interface';
 import { MatCard, MatCardTitle } from '@angular/material/card';
 import { DoubleSliderComponent } from "../double-slider/double-slider.component";
 

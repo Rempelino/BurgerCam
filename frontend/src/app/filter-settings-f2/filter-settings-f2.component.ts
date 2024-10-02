@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { VideoStreamComponent } from '../video-streamer/video-streamer.component';
 import { DoubleSliderComponent } from "../double-slider/double-slider.component";
 import { MatCard, MatCardTitle } from '@angular/material/card';
-import { SettingsStructure } from '../setings-interface';
+import { SettingsStructure } from '../app.interface';
 import { firstValueFrom } from 'rxjs';
 import { ApiServiceService } from '../api.service';
 

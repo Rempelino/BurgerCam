@@ -12,6 +12,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RouterModule , RouterLink, RouterLinkActive} from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SettingsStructure } from './app.interface';
+import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
+import { ApiServiceService } from './api.service';
+import { Subscription, interval } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -23,10 +27,42 @@ import { CommonModule } from '@angular/common';
             MatSidenavModule,
             MatListModule,
             MatIconModule,
-            MatSlider],
+            MatSlider,
+          ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
+
+  constructor(private apiService: ApiServiceService) { }
+
+  private reconnectSubscription: Subscription | null = null;
+
+  failedToConnect: Boolean = true;
   title = 'frontend_new';
+  settings!: SettingsStructure
+
+  ngOnInit(){
+    this.startPolling();
+  }
+
+  async getStatus() {
+    const settings = await firstValueFrom(this.apiService.getSettings());
+    if (settings) {
+      this.settings = settings;
+      console.log("updated settings", settings)
+    }
+  }
+
+  private startPolling() {
+    if (!this.reconnectSubscription) {
+      this.reconnectSubscription = interval(5000).subscribe(() => {
+        if (this.failedToConnect) {
+          this.getStatus();
+        }
+      });
+    }
+  }
+
+ 
 }

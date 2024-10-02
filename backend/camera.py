@@ -1,7 +1,7 @@
 import gxipy as gx
 import cv2
-from interface import Settings, CamSettings
-from time import sleep
+from interface import Settings
+from interface_definition import CamSettings
 
 
 class Camera:
@@ -13,8 +13,6 @@ class Camera:
     def __init__(self, settings: Settings):
         self.settings = settings
         self.connect_camera()
-        # self.read_camera_settings()
-        # self.settings = settings
 
     def write_settings(self):
         if not self.camera_is_connected:
@@ -62,6 +60,13 @@ class Camera:
         self.cam.stream_on()
         self.write_settings()
         self.camera_is_connected = True
+        self.settings.set_cam_connection_state(self.camera_is_connected)
+
+    def disconnect_camera(self):
+        self.cam.close_device()
+        self.camera_is_connected = False
+        self.settings.set_cam_connection_state(self.camera_is_connected)
+
 
     def get_frame(self):
         if not self.camera_is_connected:
@@ -76,15 +81,17 @@ class Camera:
             self.cam.TriggerSoftware.send_command()
         except gx.OffLine:
             print("camera disconnected")
-            self.connect_camera()
+            self.disconnect_camera()
             return None
+        except Exception as e:
+            print(f"error at sending command {e}")
+
 
         # retrieve the frame
         raw_image = self.cam.data_stream[0].get_image()
         if raw_image is None:
             print("no frame received. Reconnecting camera")
-            self.camera_is_connected = False
-            self.cam.close_device()
+            self.disconnect_camera()
             return None
 
         rgb_image = raw_image.convert("RGB")

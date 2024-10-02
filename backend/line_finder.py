@@ -48,10 +48,11 @@ class LineFinder:
                     waiting_for_hill = True
 
         if len(detected_lines) > self.line_count:
-            print(f'detected {len(detected_lines)}. Ignoring the smallest one')
+            # print(f'detected {len(detected_lines)}. Ignoring the smallest one')
             detected_lines = sorted(detected_lines, reverse=True, key=lambda x: self.frame[x])[:self.line_count]
         else:
-            print(f'detected {len(detected_lines)} from {self.line_count} lines')
+            # print(f'detected {len(detected_lines)} from {self.line_count} lines')
+            pass
         detected_lines = sorted(detected_lines)
 
         mapped = self.map_lists([[x, y] for x, y in enumerate([x[0] for x in self.lines])],

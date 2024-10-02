@@ -1,39 +1,9 @@
-from dataclasses import dataclass, asdict, fields, is_dataclass, field
+from dataclasses import asdict, fields, is_dataclass
 from typing import Union
 from enum import Enum
 from save_settings import write_dataclass_to_file, read_dataclass_from_file
+from interface_definition import SettingsStructure, MaxMin, ColourFilter, CamSettings
 import struct
-
-
-@dataclass
-class CamSettings:
-    ReverseX: bool = False
-    ReverseY: bool = False
-    ExposureTime: float = 0.0
-    ColorTransformationEnable: bool = False
-
-
-@dataclass
-class MaxMin:
-    max: int = 0
-    min: int = 0
-
-
-@dataclass
-class ColourFilter:
-    hue: MaxMin = field(default_factory=MaxMin)
-    saturation: MaxMin = field(default_factory=MaxMin)
-    value: MaxMin = field(default_factory=MaxMin)
-
-
-@dataclass
-class SettingsStructure:
-    colourFilter: ColourFilter = field(default_factory=ColourFilter)
-    filter_1: int = 0
-    filter_2: int = 0
-    frame_cutout: MaxMin = field(default_factory=MaxMin)
-    lines: int = 0
-    cam_settings: CamSettings = field(default_factory=CamSettings)
 
 
 class Settings:
@@ -41,10 +11,9 @@ class Settings:
     cam_update_request_flag = False
 
     def __init__(self):
-        self.settings: SettingsStructure = SettingsStructure()
-        settings = read_dataclass_from_file(SettingsStructure, 'settings_save.pkl')
-        if settings is not None:
-            self.settings = settings
+        self.settings = read_dataclass_from_file(SettingsStructure, 'settings_save.pkl')
+        if not check_dataclass_structure(self.settings, SettingsStructure):
+            self.settings = SettingsStructure()
         self.validate_settings(self.settings)
 
     def set_settings(self, settings: Union[SettingsStructure, bytearray]):
@@ -134,6 +103,12 @@ class Settings:
             print(e)
             return current_settings, index
 
+    def set_cam_connection_state(self, state):
+        self.settings.status.camera_connected = state
+
+    def set_PLC_connection_state(self, state):
+        self.settings.status.PLC_connected = state
+
 
 def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))
@@ -152,6 +127,16 @@ class MessageType(Enum):
     REQUEST_SETTINGS = 3
     IDLE = 4
     PLC_CONFIRM = 5
+
+
+def check_dataclass_structure(obj, dataclass_type):
+    if not (isinstance(obj, dataclass_type) and is_dataclass(obj)):
+        return False
+
+    expected_fields = {f.name for f in fields(dataclass_type)}
+    actual_fields = set(obj.__dict__.keys())
+
+    return expected_fields == actual_fields
 
 
 if __name__ == '__main__':
