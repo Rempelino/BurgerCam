@@ -30,12 +30,10 @@ export class FilterSettingsColourComponent {
     this.failedToConnect = true;
     const settings = await firstValueFrom(this.apiService.getSettings());
     if (settings) {
-      console.log("received settings", settings);
       this.settings = settings;
       this.failedToConnect = false;
     } else {
       this.failedToConnect = true;
-      console.log("failed to retrieve data from backend!")
     }
   }
 

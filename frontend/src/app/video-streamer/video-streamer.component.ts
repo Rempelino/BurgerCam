@@ -28,7 +28,7 @@ export class VideoStreamComponent implements OnInit {
   isStreamEnabled = true;
   url = ''
   enableFrameUpdate = true;
-  disable_component = true;
+  disable_component = false;
 
   constructor(private sanitizer: DomSanitizer) { }
 

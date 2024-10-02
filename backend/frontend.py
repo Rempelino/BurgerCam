@@ -41,7 +41,7 @@ class Frontend:
         flask_thread.start()
 
     def run_flask(self):
-        self.app.run(debug=False, threaded=True, port=57000)
+        self.app.run(debug=False, threaded=True, port=57000, host='0.0.0.0')
 
     def define_routes(self):
 
