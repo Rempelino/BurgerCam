@@ -1,0 +1,65 @@
+$light_gray: #ebe8e8;
+$gray: #333232;
+$mango: #ff9933;
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.toggle-button {
+    position: relative;
+    width: 75px;
+    height: 40px;
+    background-color: transparent;
+    border: 2px solid $gray;
+    border-radius: 22px;
+    transition: border-color 0.3s ease;
+
+    &.active {
+        border-color: $mango;
+    }
+
+    &.inactive {
+        border-color: $light_gray;
+    }
+}
+
+.toggle-circle {
+    position: absolute;
+    top: -1px;
+    left: -1px; /* Start from the left side */
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+
+    span {
+        color: $gray;
+        font-size: 24px;
+    }
+}
+
+.toggle-button.active .toggle-circle {
+    left: calc(100% - 41px); /* Move to the right side when enabled */
+    background-color: $mango;
+}
+
+.toggle-button.inactive .toggle-circle {
+    left: -1px;
+    background-color: $light_gray;
+}
+
+
+.toggle-text {
+    font-size: 16px;
+    font-family: 'Segoe UI';
+    color: $light_gray;
+    margin-left: 15px;
+}

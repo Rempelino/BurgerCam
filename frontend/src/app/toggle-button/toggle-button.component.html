@@ -1,0 +1,8 @@
+<div class="toggle-container"(click)="toggle()">
+    <div class="toggle-button" [ngClass]="{'active': isTicked, 'inactive': !isTicked}" >
+        <div class="toggle-circle">
+            <span>{{ isTicked ? 'I' : 'O' }}</span>
+        </div>
+    </div>
+    <span class="toggle-text">{{ text }}</span>
+</div>
