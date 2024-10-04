@@ -24,37 +24,8 @@ import { ApiServiceService } from '../api.service';
 
 
 export class FilterSettingsF2Component {
+  settings!: SettingsStructure
   failedToConnect: boolean = false;
-  settings!: SettingsStructure;
-  
-  constructor(private apiService: ApiServiceService) { }
 
-  async ngOnInit() {
-    const settings = await firstValueFrom(this.apiService.getSettings());
-    if (settings) {
-      this.settings = settings;
-      this.failedToConnect = false;
-    } else {
-      this.failedToConnect = true;
-      console.log("failed to retrieve data from backend!")
-    }
-  }
-
-  onValueChange(value: number) {
-    if (this.settings) {
-      this.settings.filter_2 = value;
-      this.sendDataToBackend();
-    }
-  }
-
-  sendDataToBackend() {
-    this.apiService.setSettings(this.settings).subscribe({
-      next: (response) => {
-        console.log('Settings updated successfully', response);
-      },
-      error: (error) => {
-        console.error('Error updating settings', error);
-      }
-    });
-  }
+  constructor(public API: ApiServiceService) { }
 }

@@ -33,36 +33,6 @@ import { Subscription, interval } from 'rxjs';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-
-  constructor(private apiService: ApiServiceService) { }
-
-  private reconnectSubscription: Subscription | null = null;
-
-  failedToConnect: Boolean = true;
-  title = 'frontend_new';
-  settings!: SettingsStructure
-
-  ngOnInit(){
-    this.startPolling();
-  }
-
-  async getStatus() {
-    const settings = await firstValueFrom(this.apiService.getSettings());
-    if (settings) {
-      this.settings = settings;
-      console.log("updated settings", settings)
-    }
-  }
-
-  private startPolling() {
-    if (!this.reconnectSubscription) {
-      this.reconnectSubscription = interval(5000).subscribe(() => {
-        if (this.failedToConnect) {
-          this.getStatus();
-        }
-      });
-    }
-  }
-
- 
+  constructor(public API: ApiServiceService) { }
+  title = 'Burger Cam';
 }

@@ -23,7 +23,7 @@ class ColourFilter:
 
 
 @dataclass
-class Status:
+class State:
     camera_connected: bool = False
     PLC_connected: bool = False
 
@@ -36,4 +36,3 @@ class SettingsStructure:
     frame_cutout: MaxMin = field(default_factory=MaxMin)
     lines: int = 0
     cam_settings: CamSettings = field(default_factory=CamSettings)
-    status: Status = field(default_factory=Status)

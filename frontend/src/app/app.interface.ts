@@ -24,7 +24,7 @@ export interface ColourFilter {
     value: MaxMin;
 }
 
-export interface Status {
+export interface State {
     camera_connected: boolean;
     PLC_connected: boolean;
 }
@@ -36,5 +36,4 @@ export interface SettingsStructure {
     frame_cutout: MaxMin;
     lines: number;
     cam_settings: CamSettings;
-    status: Status;
 }

@@ -37,8 +37,9 @@ export class DoubleSliderComponent {
   @Input() minValue: number = 0;
   @Input() maxValue: number = 255;
 
-  @Output() value1Changed = new EventEmitter<number>();
-  @Output() value2Changed = new EventEmitter<number>();
+  @Output() value1Change = new EventEmitter<number>();
+  @Output() value2Change = new EventEmitter<number>();
+  @Output() valueChange = new EventEmitter<void>();
 
   onValue1Change(value: number) {
     if (this.isSingleSlider) {
@@ -47,12 +48,15 @@ export class DoubleSliderComponent {
       value = Math.max(Math.min(value, this.value2), this.minValue);
     }
     this.value1 = value;
-    this.value1Changed.emit(this.value1);
+    this.value1Change.emit(this.value1);
+    this.valueChange.emit();
   }
 
   onValue2Change(value: number) {
     value = Math.max(Math.min(value, this.maxValue), this.value1);
     this.value2 = value;
-    this.value2Changed.emit(this.value2);
+    this.value2Change.emit(this.value2);
+    this.valueChange.emit();
   }
+  
 }

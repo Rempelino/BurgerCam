@@ -1,16 +1,16 @@
 <!-- Status Bar -->
 <div class="body">
-    <div *ngIf="settings" class="status-bar">
+    <div *ngIf="API.state" class="status-bar">
 
-        <div [ngClass]="settings.status.camera_connected ? 'status-item-OK' : 'status-item-FAIL'">
+        <div [ngClass]="API.state.camera_connected ? 'status-item-OK' : 'status-item-FAIL'">
             <mat-icon>photo_camera</mat-icon>
-            <span *ngIf="settings.status.camera_connected; else cam_disconnected">Cam Connected</span>
+            <span *ngIf="API.state.camera_connected; else cam_disconnected">Cam Connected</span>
             <ng-template #cam_disconnected>Cam Disconnected</ng-template>
         </div>
 
-        <div [ngClass]="settings.status.PLC_connected ? 'status-item-OK' : 'status-item-FAIL'">
+        <div [ngClass]="API.state.PLC_connected ? 'status-item-OK' : 'status-item-FAIL'">
             <mat-icon>developer_board</mat-icon>
-            <span *ngIf="settings.status.PLC_connected; else plc_disconnected">PLC Connected</span>
+            <span *ngIf="API.state.PLC_connected; else plc_disconnected">PLC Connected</span>
             <ng-template #plc_disconnected>PLC Disconnected</ng-template>
         </div>
     </div>

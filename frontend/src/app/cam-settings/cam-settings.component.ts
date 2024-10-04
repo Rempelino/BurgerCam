@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToggleButtonComponent } from '../toggle-button/toggle-button.component';
+import { appendFile } from 'fs';
 
 @Component({
   selector: 'app-cam-settings',
@@ -31,77 +32,7 @@ import { ToggleButtonComponent } from '../toggle-button/toggle-button.component'
   styleUrl: './cam-settings.component.scss'
 })
 export class CamSettingsComponent {
-  settings!: SettingsStructure
-  failedToConnect: boolean = true;
-  private reconnectSubscription: Subscription | null = null;
+  failedToConnect: boolean = false;
 
-  constructor(private apiService: ApiServiceService) { }
-
-  ngOnInit(){
-    this.connectToBackend();
-  }
-
-  ngOnDestroy() {
-    this.stopReconnection();
-  }
-
-  async connectToBackend() {
-    const settings = await firstValueFrom(this.apiService.getSettings());
-    if (settings) {
-      this.settings = settings;
-      this.stopReconnection();
-    } else {
-      this.startReconnection();
-    }
-  }
-
-  private startReconnection() {
-    this.failedToConnect = true;
-    if (!this.reconnectSubscription) {
-      this.reconnectSubscription = interval(5000).subscribe(() => {
-        if (this.failedToConnect) {
-          this.connectToBackend();
-        }
-      });
-    }
-  }
-
-  private stopReconnection() {
-    this.failedToConnect = false;
-    if (this.reconnectSubscription) {
-      this.reconnectSubscription.unsubscribe();
-      this.reconnectSubscription = null;
-    }
-  }
-
-  onExpoTimeChange(value: number) {
-    if (this.settings) {
-      this.settings.cam_settings.ExposureTime = value;
-      this.sendDataToBackend();
-    }
-  }
-
-  onCutOutMinChanged(value: number) {
-    if (this.settings) {
-      this.settings.frame_cutout.min = value;
-      this.sendDataToBackend();
-    }
-  }
-
-  onCutOutMaxChanged(value: number) {
-    if (this.settings) {
-      this.settings.frame_cutout.max = value;
-      this.sendDataToBackend();
-    }
-  }
-
-  sendDataToBackend() {
-    this.apiService.setSettings(this.settings).subscribe({
-      error: () => {
-        this.startReconnection();
-      }
-    });
-  }
-
-
+  constructor(public API: ApiServiceService) { }
 }

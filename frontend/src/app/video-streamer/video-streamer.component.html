@@ -1,5 +1,5 @@
 <div *ngIf="!disable_component" #videoContainer>
-    <div *ngIf="optionsAvailable">
+    <div *ngIf="optionsAvailable" class="body">
         <mat-form-field>
             <mat-label>Filter</mat-label>
             <mat-select [(value)]="filter" (valueChange)="onSettingChange()">
@@ -8,9 +8,8 @@
                 }
             </mat-select>
         </mat-form-field>
-
-        <mat-checkbox [(ngModel)]="with_level" (change)="onSettingChange()">with level</mat-checkbox>
-        <mat-checkbox [(ngModel)]="with_rows" (change)="onSettingChange()">with rows</mat-checkbox>
+        <toggle-button [(isTicked)]="with_level" text="with level" (isTickedChange)="onSettingChange()"></toggle-button>
+        <toggle-button [(isTicked)]="with_rows" text="with rows" (isTickedChange)="onSettingChange()"></toggle-button>
     </div>
     <p></p>
     <img [src]="videoUrl" *ngIf="isStreamEnabled">

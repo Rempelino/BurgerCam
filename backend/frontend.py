@@ -51,6 +51,12 @@ class Frontend:
                 return '', 200
             return jsonify(self.settings.get_settings())
 
+        @self.app.route('/api/state')
+        def get_state():
+            if request.method == 'OPTIONS':
+                return '', 200
+            return jsonify(self.settings.state)
+
         @self.app.route('/api/set_settings', methods=['POST'])
         def set_settings():
             def float_hook(value: Union[int, float]) -> float:

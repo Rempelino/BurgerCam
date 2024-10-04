@@ -7,6 +7,7 @@ import { environment } from '../../enviroments/enviroment';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatOption, MatSelect } from '@angular/material/select';
+import { ToggleButtonComponent } from '../toggle-button/toggle-button.component';
 
 interface Filter {
   value: string;
@@ -21,7 +22,8 @@ interface Filter {
     MatFormField,
     MatLabel,
     MatSelect,
-    MatOption
+    MatOption,
+    ToggleButtonComponent
   ],
   templateUrl: './video-streamer.component.html',
   styleUrl: './video-streamer.component.scss'

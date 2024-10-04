@@ -2,7 +2,7 @@ from dataclasses import asdict, fields, is_dataclass
 from typing import Union
 from enum import Enum
 from save_settings import write_dataclass_to_file, read_dataclass_from_file
-from interface_definition import SettingsStructure, MaxMin, ColourFilter, CamSettings
+from interface_definition import SettingsStructure, MaxMin, ColourFilter, CamSettings, State
 import struct
 
 
@@ -11,10 +11,15 @@ class Settings:
     cam_update_request_flag = False
 
     def __init__(self):
-        self.settings = read_dataclass_from_file(SettingsStructure, 'settings_save.pkl')
+        try:
+            self.settings = read_dataclass_from_file(SettingsStructure, 'settings_save.pkl')
+        except AttributeError:
+            self.settings = None
         if not check_dataclass_structure(self.settings, SettingsStructure):
             self.settings = SettingsStructure()
         self.validate_settings(self.settings)
+        self.state = State()
+
 
     def set_settings(self, settings: Union[SettingsStructure, bytearray]):
         print(f"setting settings to {settings}")
@@ -44,7 +49,7 @@ class Settings:
         self.settings.filter_1 = clamp(new_settings.filter_1, 0, 30)
         self.settings.filter_2 = clamp(new_settings.filter_2, 0, 30)
 
-        self.settings.frame_cutout = clamp_max_min(new_settings.frame_cutout, 0, 4096)
+        self.settings.frame_cutout = clamp_max_min(new_settings.frame_cutout, 0, 3000, min_distance=50)
 
     def get_cam_settings(self):
         return self.settings.cam_settings
@@ -104,11 +109,10 @@ class Settings:
             return current_settings, index
 
     def set_cam_connection_state(self, state):
-        print("state was changed")
-        self.settings.status.camera_connected = state
+        self.state.camera_connected = state
 
     def set_PLC_connection_state(self, state):
-        self.settings.status.PLC_connected = state
+        self.state.PLC_connected = state
 
 
 def clamp(n, smallest, largest):

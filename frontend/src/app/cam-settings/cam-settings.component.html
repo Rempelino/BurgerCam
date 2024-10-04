@@ -5,7 +5,7 @@
     </ng-container>
 </div>
 
-<div *ngIf="!failedToConnect&&settings">
+<div *ngIf="!failedToConnect&&API.settings">
     <div class="mat-card-container">
         <mat-card>
             <mat-card-title>Live View</mat-card-title>
@@ -16,21 +16,20 @@
         </mat-card>
         <mat-card class="card-style">
             <mat-card-title>Camera Settings</mat-card-title>
-            <app-double-slider [value1]="settings.cam_settings.ExposureTime" label1="Exposure Time"
-                (value1Changed)="onExpoTimeChange($event)" [isSingleSlider]="true" [minValue]="10000"
+            <app-double-slider [(value1)]="API.settings.cam_settings.ExposureTime" label1="Exposure Time"
+                (valueChange)="API.setSettings()" [isSingleSlider]="true" [minValue]="10000"
                 [maxValue]="100000">
             </app-double-slider>
-            <app-double-slider [value1]="settings.frame_cutout.min" [value2]="settings.frame_cutout.max"
-                label1="Min Cutout" label2="Max Cutout" (value1Changed)="onCutOutMinChanged($event)" [maxValue]="4096"
-                (value2Changed)="onCutOutMaxChanged($event)">
+            <app-double-slider [(value1)]="API.settings.frame_cutout.min" [(value2)]="API.settings.frame_cutout.max"
+                label1="Min Cutout" label2="Max Cutout" (valueChange)="API.setSettings()" [maxValue]="3000">
             </app-double-slider>
 
-            <toggle-button [(isTicked)]="settings.cam_settings.ReverseX" text="Reverse X"
-                (isTickedChange)="sendDataToBackend()"></toggle-button>
-            <toggle-button [(isTicked)]="settings.cam_settings.ReverseY" text="Reverse Y"
-                (isTickedChange)="sendDataToBackend()"></toggle-button>
-            <toggle-button [(isTicked)]="settings.cam_settings.ColorTransformationEnable"
-                text="Enable Color Transformation" (isTickedChange)="sendDataToBackend()"></toggle-button>
+            <toggle-button [(isTicked)]="API.settings.cam_settings.ReverseX" text="Reverse X"
+                (isTickedChange)="API.setSettings()"></toggle-button>
+            <toggle-button [(isTicked)]="API.settings.cam_settings.ReverseY" text="Reverse Y"
+                (isTickedChange)="API.setSettings()"></toggle-button>
+            <toggle-button [(isTicked)]="API.settings.cam_settings.ColorTransformationEnable"
+                text="Enable Color Transformation" (isTickedChange)="API.setSettings()"></toggle-button>
         </mat-card>
     </div>
 </div>
