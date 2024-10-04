@@ -26,7 +26,7 @@ import { MatSlider, MatSliderModule } from '@angular/material/slider';
     }
   ],
   templateUrl: './double-slider.component.html',
-  styleUrl: './double-slider.component.css'
+  styleUrl: './double-slider.component.scss'
 })
 export class DoubleSliderComponent {
   @Input() value1: number = 0;

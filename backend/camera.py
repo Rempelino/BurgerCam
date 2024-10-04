@@ -60,11 +60,13 @@ class Camera:
         self.cam.stream_on()
         self.write_settings()
         self.camera_is_connected = True
+        print("Connected Cam")
         self.settings.set_cam_connection_state(self.camera_is_connected)
 
     def disconnect_camera(self):
         self.cam.close_device()
         self.camera_is_connected = False
+        print("Disconnected Cam")
         self.settings.set_cam_connection_state(self.camera_is_connected)
 
 

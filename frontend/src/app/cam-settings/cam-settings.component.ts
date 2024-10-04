@@ -4,12 +4,13 @@ import { DoubleSliderComponent } from '../double-slider/double-slider.component'
 import { SettingsStructure } from '../app.interface';
 import { firstValueFrom, interval, Subscription } from 'rxjs';
 import { ApiServiceService } from '../api.service';
-import { MatCard, MatCardTitle } from '@angular/material/card';
+import { MatCard, MatCardContent, MatCardTitle } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ToggleButtonComponent } from '../toggle-button/toggle-button.component';
 
 @Component({
   selector: 'app-cam-settings',
@@ -22,10 +23,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatCardTitle,
     MatCheckbox,
     MatIcon,
-    MatProgressSpinnerModule  
+    MatProgressSpinnerModule,
+    MatCardContent,
+    ToggleButtonComponent
   ],
   templateUrl: './cam-settings.component.html',
-  styleUrl: './cam-settings.component.css'
+  styleUrl: './cam-settings.component.scss'
 })
 export class CamSettingsComponent {
   settings!: SettingsStructure

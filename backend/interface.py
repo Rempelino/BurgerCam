@@ -104,6 +104,7 @@ class Settings:
             return current_settings, index
 
     def set_cam_connection_state(self, state):
+        print("state was changed")
         self.settings.status.camera_connected = state
 
     def set_PLC_connection_state(self, state):

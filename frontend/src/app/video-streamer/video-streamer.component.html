@@ -1,24 +1,16 @@
 <div *ngIf="!disable_component" #videoContainer>
-    Live View
-    <hr>
     <div *ngIf="optionsAvailable">
-        <input type="checkbox" [(ngModel)]="enableFrameUpdate" (change)="onEnableChange(enableFrameUpdate)">
-        <label>enable stream</label>
-        <div>
-            <label for="filterSelect">Choose a filter:</label>
-            <select id="filterSelect" [(ngModel)]="filter" (change)="onSettingChange()">
-                <option value="none">Raw image</option>
-                <option value="mono">Monochrom</option>
-                <option value="filter_1">Filter 1</option>
-                <option value="filter_2">Filter 2</option>
-                <option value="pixel_counter">Pixel counter</option>
-            </select>
-        </div>
-        <input type="checkbox" [id]="ID + 'cb2'" [(ngModel)]="with_level" (change)="onSettingChange()">
-        <label [for]="ID + 'cb2'">with level</label>
-        <p></p>
-        <input type="checkbox" [id]="ID + 'cb3'" [(ngModel)]="with_rows" (change)="onSettingChange()">
-        <label [for]="ID + 'cb3'">with rows</label>
+        <mat-form-field>
+            <mat-label>Filter</mat-label>
+            <mat-select [(value)]="filter" (valueChange)="onSettingChange()">
+                @for (f of filters; track f) {
+                <mat-option [value]="f.value">{{f.viewValue}}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
+        <mat-checkbox [(ngModel)]="with_level" (change)="onSettingChange()">with level</mat-checkbox>
+        <mat-checkbox [(ngModel)]="with_rows" (change)="onSettingChange()">with rows</mat-checkbox>
     </div>
     <p></p>
     <img [src]="videoUrl" *ngIf="isStreamEnabled">

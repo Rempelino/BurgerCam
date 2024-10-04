@@ -1,15 +1,40 @@
 /* You can add global styles to this file, and also import other style files */
 
 $gray: #333232;
+$light_gray: #ebe8e8;
 $tourquise: #1cc7d0;
 
 html,
-body {
-    height: 100%;
-}
 
 body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
     background-color: $gray;
 }
+
+.mat-card-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background-color: $gray;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  mat-card {
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: lighten($gray, 10%);
+  }
+  
+  mat-card-content {
+    background-color: lighten($gray, 10%);
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  label, mat-card-title {
+    color: $light_gray;
+  }

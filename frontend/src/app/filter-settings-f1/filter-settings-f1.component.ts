@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { VideoStreamComponent } from '../video-streamer/video-streamer.component';
 import { DoubleSliderComponent } from "../double-slider/double-slider.component";
-import { MatCard, MatCardTitle } from '@angular/material/card';
+import { MatCard, MatCardContent, MatCardTitle } from '@angular/material/card';
 import { SettingsStructure } from '../app.interface';
 import { firstValueFrom } from 'rxjs';
 import { ApiServiceService } from '../api.service';
@@ -15,10 +15,11 @@ import { ApiServiceService } from '../api.service';
     DoubleSliderComponent,
     DoubleSliderComponent,
     MatCard,
-    MatCardTitle
+    MatCardTitle,
+    MatCardContent
   ],
   templateUrl: './filter-settings-f1.component.html',
-  styleUrl: './filter-settings-f1.component.css'
+  styleUrl: './filter-settings-f1.component.scss'
 })
 export class FilterSettingsF1Component {
   failedToConnect: boolean = false;

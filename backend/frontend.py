@@ -49,7 +49,6 @@ class Frontend:
         def get_settings():
             if request.method == 'OPTIONS':
                 return '', 200
-            print(f"sending settings: {self.settings.get_settings()}")
             return jsonify(self.settings.get_settings())
 
         @self.app.route('/api/set_settings', methods=['POST'])

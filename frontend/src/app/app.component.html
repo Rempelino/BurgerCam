@@ -18,31 +18,66 @@
     <mat-sidenav-container class="sidenav-container position-relative">
         <mat-sidenav #sidenav mode="side" opened fixedInViewport>
             <mat-nav-list>
+
                 <a class="a" mat-list-item routerLink="/live-view" routerLinkActive="active">
-                    <mat-icon>camera</mat-icon>
-                    Live View
-                </a>
-                
+                    <div class="nav-item-content">
+                        <mat-icon>camera</mat-icon>
+                        <div class="nav-item-text">
+                            <div>Live View</div>
+                        </div>
+                    </div>
+                </a>                
+
                 <a class="a" mat-list-item routerLink="/filter-settings-colour" routerLinkActive="active">
-                    <mat-icon>settings_input_component</mat-icon>
-                    Filter Settings | Colour
+                    <div class="nav-item-content">
+                        <mat-icon>settings_input_component</mat-icon>
+                        <div class="nav-item-text">
+                            <div>Filter Settings</div>
+                            <div>Colour</div>
+                        </div>
+                    </div>
                 </a>
+
                 <a class="a" mat-list-item routerLink="/filter-settings-f1" routerLinkActive="active">
-                    <mat-icon>settings_input_component</mat-icon>
-                    Filter Settings | Filter 1
+                    <div class="nav-item-content">
+                        <mat-icon>settings_input_component</mat-icon>
+                        <div class="nav-item-text">
+                            <div>Filter Settings</div>
+                            <div>Filter 1</div>
+                        </div>
+                    </div>
                 </a>
+
                 <a class="a" mat-list-item routerLink="/filter-settings-f2" routerLinkActive="active">
-                    <mat-icon>settings_input_component</mat-icon>
-                    Filter Settings | Filter 2
+                    <div class="nav-item-content">
+                        <mat-icon>settings_input_component</mat-icon>
+                        <div class="nav-item-text">
+                            <div>Filter Settings</div>
+                            <div>Filter 2</div>
+                        </div>
+                    </div>
                 </a>
+
                 <a class="a" mat-list-item routerLink="/cam-settings" routerLinkActive="active">
-                    <mat-icon>photo_camera</mat-icon>
-                    Camera Settings
+                    <div class="nav-item-content">
+                        <mat-icon>photo_camera</mat-icon>
+                        <div class="nav-item-text">
+                            <div>Camera</div>
+                            <div>Settings</div>
+                        </div>
+                    </div>
                 </a>
-                <a class="a" mat-list-item routerLink="/system-settings" routerLinkActive="active">
-                    <mat-icon>settings</mat-icon>
-                    System Settings
-                </a>
+
+                <!--a class="a" mat-list-item routerLink="/system-settings" routerLinkActive="active">
+                    <div class="nav-item-content">
+                        <mat-icon>settings</mat-icon>
+                        <div class="nav-item-text">
+                            <div>System</div>
+                            <div>Settings</div>
+                        </div>
+                    </div>
+                </a-->
+
             </mat-nav-list>
         </mat-sidenav>
         <mat-sidenav-content>

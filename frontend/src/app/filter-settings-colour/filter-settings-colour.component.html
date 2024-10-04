@@ -2,19 +2,37 @@
     Connection to backend failed
 </div>
 
+
+
 <div *ngIf="!failedToConnect&&settings">
-    <app-video-streamer [checkBoxLabel]="'Monochrom'"[ID]="'1'"filter="mono" [optionsAvailable]="false"></app-video-streamer>
-    <mat-card class="card-style">
-        <mat-card-title>Colour Filter</mat-card-title>
-        <app-double-slider [value1]="settings.colourFilter.hue.min" [value2]="settings.colourFilter.hue.max" label1="Min Hue"
-            label2="Max Hue" (value1Changed)="onHueMinChanged($event)" (value2Changed)="onHueMaxChanged($event)">
-        </app-double-slider>
-        <app-double-slider [value1]="settings.colourFilter.saturation.min" [value2]="settings.colourFilter.saturation.max"
-            label1="Min Saturation" label2="Max Saturation" (value1Changed)="onSatMinChanged($event)"
-            (value2Changed)="onSatMaxChanged($event)">
-        </app-double-slider>
-        <app-double-slider [value1]="settings.colourFilter.value.min" [value2]="settings.colourFilter.value.max" label1="Min Value"
-            label2="Max Value" (value1Changed)="onValueMinChanged($event)" (value2Changed)="onValueMaxChanged($event)">
-        </app-double-slider>
-    </mat-card>
+
+    <div class="mat-card-container">
+        <mat-card>
+            <mat-card-title>Live View</mat-card-title>
+            <mat-card-content>
+                <app-video-streamer [checkBoxLabel]="'Monochrom'" [ID]="'1'" filter="mono"
+                    [optionsAvailable]="false"></app-video-streamer>
+            </mat-card-content>
+        </mat-card>
+
+
+        <mat-card class="card-style">
+            <mat-card-title>Colour Filter</mat-card-title>
+            <mat-card-content>
+                <app-double-slider [value1]="settings.colourFilter.hue.min" [value2]="settings.colourFilter.hue.max"
+                    label1="Min Hue" label2="Max Hue" (value1Changed)="onHueMinChanged($event)"
+                    (value2Changed)="onHueMaxChanged($event)">
+                </app-double-slider>
+                <app-double-slider [value1]="settings.colourFilter.saturation.min"
+                    [value2]="settings.colourFilter.saturation.max" label1="Min Saturation" label2="Max Saturation"
+                    (value1Changed)="onSatMinChanged($event)" (value2Changed)="onSatMaxChanged($event)">
+                </app-double-slider>
+                <app-double-slider [value1]="settings.colourFilter.value.min" [value2]="settings.colourFilter.value.max"
+                    label1="Min Value" label2="Max Value" (value1Changed)="onValueMinChanged($event)"
+                    (value2Changed)="onValueMaxChanged($event)">
+                </app-double-slider>
+            </mat-card-content>
+        </mat-card>
+
+    </div>
 </div>

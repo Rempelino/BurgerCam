@@ -4,14 +4,27 @@ import { FormsModule } from '@angular/forms';
 import { OnInit, ElementRef, Input, ViewChild } from '@angular/core';
 import { SafeUrl, DomSanitizer } from '@angular/platform-browser';
 import { environment } from '../../enviroments/enviroment';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatOption, MatSelect } from '@angular/material/select';
 
+interface Filter {
+  value: string;
+  viewValue: string;
+}
 
 @Component({
   selector: 'app-video-streamer',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule,
+    MatCheckbox,
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    MatOption
+  ],
   templateUrl: './video-streamer.component.html',
-  styleUrl: './video-streamer.component.css'
+  styleUrl: './video-streamer.component.scss'
 })
 
 
@@ -29,6 +42,14 @@ export class VideoStreamComponent implements OnInit {
   url = ''
   enableFrameUpdate = true;
   disable_component = false;
+
+  filters: Filter[] = [
+    {value: 'none', viewValue: 'None'},
+    {value: 'mono', viewValue: 'Monochrom'},
+    {value: 'filter_1', viewValue: 'Filter 1'},
+    {value: 'filter_2', viewValue: 'Filter 2'},
+    {value: 'pixel_counter', viewValue: 'Pixel Counter'},
+  ];
 
   constructor(private sanitizer: DomSanitizer) { }
 

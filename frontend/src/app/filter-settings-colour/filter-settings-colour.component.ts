@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ApiServiceService } from '../api.service';
 import { firstValueFrom } from 'rxjs';
 import { SettingsStructure } from '../app.interface';
-import { MatCard, MatCardTitle } from '@angular/material/card';
+import { MatCard, MatCardContent, MatCardTitle } from '@angular/material/card';
 import { DoubleSliderComponent } from "../double-slider/double-slider.component";
 
 
@@ -15,10 +15,11 @@ import { DoubleSliderComponent } from "../double-slider/double-slider.component"
     CommonModule,
     MatCard,
     MatCardTitle,
-    DoubleSliderComponent
+    DoubleSliderComponent,
+    MatCardContent
   ],
   templateUrl: './filter-settings-colour.component.html',
-  styleUrl: './filter-settings-colour.component.css'
+  styleUrl: './filter-settings-colour.component.scss'
 })
 export class FilterSettingsColourComponent {
   settings!: SettingsStructure
