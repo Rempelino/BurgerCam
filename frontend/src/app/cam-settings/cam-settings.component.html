@@ -20,6 +20,12 @@
                 (valueChange)="API.setSettings()" [isSingleSlider]="true" [minValue]="10000"
                 [maxValue]="100000">
             </app-double-slider>
+
+            <app-double-slider [(value1)]="API.settings.fisheye" label1="Fisheye"
+                (valueChange)="API.setSettings()" [isSingleSlider]="true" [minValue]="0"
+                [maxValue]="300">
+            </app-double-slider>
+
             <app-double-slider [(value1)]="API.settings.frame_cutout.min" [(value2)]="API.settings.frame_cutout.max"
                 label1="Min Cutout" label2="Max Cutout" (valueChange)="API.setSettings()" [maxValue]="3000">
             </app-double-slider>

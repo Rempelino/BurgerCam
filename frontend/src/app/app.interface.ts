@@ -33,6 +33,7 @@ export interface SettingsStructure {
     colourFilter: ColourFilter;
     filter_1: number;
     filter_2: number;
+    fisheye: number;
     frame_cutout: MaxMin;
     lines: number;
     cam_settings: CamSettings;
