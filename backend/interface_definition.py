@@ -33,6 +33,7 @@ class SettingsStructure:
     colourFilter: ColourFilter = field(default_factory=ColourFilter)
     filter_1: int = 0
     filter_2: int = 0
+    fisheye: float = 0.1
     frame_cutout: MaxMin = field(default_factory=MaxMin)
-    lines: int = 0
+    lines: int = 6
     cam_settings: CamSettings = field(default_factory=CamSettings)

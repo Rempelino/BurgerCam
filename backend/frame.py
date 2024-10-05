@@ -26,7 +26,13 @@ class Frame:
     def __init__(self, frame, settings: SettingsStructure, lines):
         self.settings = settings
         # frame = self.rotate_image(frame, 6)
+        #k1 = -settings.fisheye / 1000
+        #k2 = 0.1
+        #p1 = 0.0
+        #p2 = 0.0
+        #frame = self.remove_fisheye(frame, k1, k2, p1, p2)
         self.frame = frame[settings.frame_cutout.min:settings.frame_cutout.max, :]
+
         if self.resize:
             height, width, _ = self.frame.shape
             self.frame_height = 300
@@ -45,6 +51,36 @@ class Frame:
         self.expected_lines = settings.lines
         self.line_detection_threshold = Line_detection_threshold
         self.lines = lines
+
+    @staticmethod
+    def remove_fisheye(img, k1, k2, p1, p2):
+
+        # Get image dimensions
+        h, w = img.shape[:2]
+
+        # Define camera matrix
+        # Assuming the focal length is half of the image width and the center point is the image center
+        focal_length = w / 2
+        center = (w / 2, h / 2)
+        camera_matrix = np.array(
+            [[focal_length, 0, center[0]],
+             [0, focal_length, center[1]],
+             [0, 0, 1]], dtype=np.float32
+        )
+        # Define distortion coefficients
+        dist_coeffs = np.array([k1, k2, p1, p2, 0], dtype=np.float32)
+
+        # Generate new camera matrix
+        new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(camera_matrix, dist_coeffs, (w, h), 1, (w, h))
+
+        # Undistort the image
+        dst = cv2.undistort(img, camera_matrix, dist_coeffs, None, new_camera_matrix)
+
+        # Crop the image
+        x, y, w, h = roi
+        dst = dst[y:y + h, x:x + w]
+
+        return dst
 
     def get_frame(self, with_rows=False, with_level=False, filter=None):
         if filter is None or filter == 'none':
