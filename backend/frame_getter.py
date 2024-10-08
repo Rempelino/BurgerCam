@@ -25,7 +25,6 @@ class FrameGetter:
                     break
                 if index == len(video_path) - 1:
                     print("video could not be opened")
-                    exit()
 
     def get_frame(self):
         if use_camera:
