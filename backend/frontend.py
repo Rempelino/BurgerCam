@@ -20,8 +20,8 @@ class Frontend:
     enable_frame_update = True
 
     def __init__(self, settings: Settings):
-        #log = logging.getLogger('werkzeug')
-        #log.setLevel(logging.WARNING)
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.WARNING)
         self.settings: Settings = settings
         self.is_connected = False
         self.app = Flask(__name__, static_folder='../frontend/dist/frontend_new/browser')

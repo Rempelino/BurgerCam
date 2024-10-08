@@ -18,7 +18,6 @@ export class ApiServiceService implements OnDestroy {
   constructor(private http: HttpClient) {
     this.getSettings();
     this.getState();
-    this.pollSettings();
     this.pollState();
   }
 
@@ -49,7 +48,7 @@ export class ApiServiceService implements OnDestroy {
     const url = `${this.apiUrl}/set_settings`;
     this.http.post<any>(url, this.settings).subscribe({
       next: (response) => {
-        //console.log('Settings updated successfully', response);
+        this.getSettings();
       },
       error: (error) => {
         console.error('Error updating settings', error);
@@ -58,7 +57,7 @@ export class ApiServiceService implements OnDestroy {
   }
 
   private pollState() {
-    this.pollSubscription = interval(5000)
+    this.pollSubscription = interval(500)
       .pipe(
         switchMap(() => this.http.get<State>(`${this.apiUrl}/state`))
       )
