@@ -5,6 +5,7 @@ from plc import PLC
 from interface import Settings
 from constants import path_video
 from line_finder import LineFinder
+import time_debug
 
 
 class Imaging:
@@ -22,9 +23,13 @@ class Imaging:
         if self.numpy_image is None:
             frame = None
         else:
+            time_debug.print_time("starting frame process")
             frame = Frame(self.numpy_image, self.settings.get_settings(), self.line_finder.get_lines())
             self.line_finder.update(frame.get_frame_collapsed(), self.settings.settings.lines)
-            self.frontend.update_frame(frame)
+            time_debug.print_time("lines updated")
+            # self.frontend.update_frame(frame)
             self.plc.send_line_values(self.line_finder.get_line_values())
         self.frontend.update_frame(frame)
+        time_debug.print_time("frontend frame updated")
         await self.plc.ready_for_new_frame()
+        time_debug.print_time("plc ready for new frame")

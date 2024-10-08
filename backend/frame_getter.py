@@ -5,7 +5,7 @@ from interface import Settings
 
 
 
-use_camera = False
+use_camera = True
 class FrameGetter:
     last_frame = None
     frame_counter = 0

@@ -1,9 +1,13 @@
+import time_debug
+
+
 class LineFinder:
     line_count = None
     lines = None
     frame = None
 
     def update(self, frame, lines):
+        time_debug.print_time("received frame in Line Finder")
         if self.line_count != lines:
             self.line_count = lines
             self.create_default()

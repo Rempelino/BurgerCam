@@ -1,6 +1,6 @@
 from datetime import  datetime
 
-disable_print = True
+disable_print = False
 print_string = ""
 last_milli_call = 0
 
@@ -10,6 +10,7 @@ def millis():
     last_milli_call = now.microsecond // 1000
     return last_milli_call
 
+
 def get_time():
     global last_milli_call
     now = datetime.now()
@@ -18,16 +19,13 @@ def get_time():
         difference += 1000
     return difference
 
-time_stamp = millis()
 
 def print_time(msg):
     global disable_print
     if disable_print:
         return
-    global time_stamp
     global print_string
     print_string = f'{print_string}{get_time()}ms- {msg}\n'
-    time_stamp = millis()
 
 
 def commit_print():
@@ -38,3 +36,4 @@ def commit_print():
     print("-------------------------")
     print(print_string)
     print_string = ""
+    millis()

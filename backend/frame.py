@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from interface import SettingsStructure
+import time_debug
 
 Line_detection_threshold = 0
 

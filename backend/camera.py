@@ -2,6 +2,7 @@ import gxipy as gx
 import cv2
 from interface import Settings
 from interface_definition import CamSettings
+import time_debug
 
 
 class Camera:
@@ -69,6 +70,9 @@ class Camera:
 
 
     def get_frame(self):
+        time_debug.print_time("-----DONE-----")
+        time_debug.commit_print()
+        time_debug.print_time("starting to get frame")
         if not self.camera_is_connected:
             self.connect_camera()
             return None
@@ -89,6 +93,7 @@ class Camera:
 
         # retrieve the frame
         raw_image = self.cam.data_stream[0].get_image()
+        time_debug.print_time("got raw image")
         if raw_image is None:
             print("no frame received. Reconnecting camera")
             self.disconnect_camera()
@@ -97,6 +102,7 @@ class Camera:
         rgb_image = raw_image.convert("RGB")
         rgb_array = rgb_image.get_numpy_array()
         numpy_image = cv2.cvtColor(rgb_array, cv2.COLOR_RGB2BGR)
+        time_debug.print_time("got mnumpy image")
         return numpy_image
 
 
