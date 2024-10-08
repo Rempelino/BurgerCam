@@ -4,10 +4,6 @@ from frontend import Frontend
 from interface import Settings
 from imaging import Imaging
 from constants import IP_PLC
-import os
-import sys
-import subprocess
-import shutil
 
 
 settings = Settings()

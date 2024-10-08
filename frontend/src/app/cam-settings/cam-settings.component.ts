@@ -34,5 +34,5 @@ import { appendFile } from 'fs';
 export class CamSettingsComponent {
   failedToConnect: boolean = false;
 
-  constructor(public API: ApiServiceService) { }
+  constructor(public API: ApiServiceService) { API.getSettings();}
 }

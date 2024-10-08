@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SettingsStructure, State } from './app.interface';
-import { environment } from '../enviroments/enviroment';
+import { environment } from '../environments/environment';
 import { interval, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
@@ -9,12 +9,15 @@ import { switchMap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class ApiServiceService implements OnDestroy {
-  private apiUrl = environment.apiUrl + '/api';
+  //private apiUrl = environment.apiUrl + '/api';
+  private apiUrl = environment.apiUrl;
   public settings!: SettingsStructure;
   public state!: State;
   private pollSubscription!: Subscription;
 
   constructor(private http: HttpClient) {
+    this.getSettings();
+    this.getState();
     this.pollSettings();
     this.pollState();
   }
@@ -26,7 +29,7 @@ export class ApiServiceService implements OnDestroy {
   }
 
   private pollSettings() {
-    this.pollSubscription = interval(5000) // Poll every 1000ms (1 second)
+    this.pollSubscription = interval(5000)
       .pipe(
         switchMap(() => this.http.get<SettingsStructure>(`${this.apiUrl}/settings`))
       )
@@ -55,7 +58,7 @@ export class ApiServiceService implements OnDestroy {
   }
 
   private pollState() {
-    this.pollSubscription = interval(5000) // Poll every 1000ms (1 second)
+    this.pollSubscription = interval(5000)
       .pipe(
         switchMap(() => this.http.get<State>(`${this.apiUrl}/state`))
       )
@@ -69,6 +72,18 @@ export class ApiServiceService implements OnDestroy {
           console.error('Error fetching state:', error);
         }
       });
+  }
+
+  public getSettings(): void {
+    this.http.get<SettingsStructure>(`${this.apiUrl}/settings`).subscribe(
+      settings => this.settings = settings
+    );
+  }
+
+  public getState(): void {
+    this.http.get<State>(`${this.apiUrl}/state`).subscribe(
+      state => this.state = state
+    );
   }
 
 }

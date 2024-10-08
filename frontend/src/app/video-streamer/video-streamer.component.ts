@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OnInit, ElementRef, Input, ViewChild } from '@angular/core';
 import { SafeUrl, DomSanitizer } from '@angular/platform-browser';
-import { environment } from '../../enviroments/enviroment';
+import { environment } from '../../environments/environment';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatOption, MatSelect } from '@angular/material/select';
@@ -84,15 +84,6 @@ export class VideoStreamComponent implements OnInit {
   private stopStream() {
     this.url = "";
     this.updateUrl();
-  }
-
-  onEnableChange(value: boolean) {
-    if (value) {
-      this.url = environment.apiUrl + `/enableFrameUpdate`
-    } else {
-      this.url = environment.apiUrl + `/disableFrameUpdate`
-    }
-    fetch(this.url)
   }
 
   private updateUrl() {

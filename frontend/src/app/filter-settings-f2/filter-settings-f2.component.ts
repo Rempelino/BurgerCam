@@ -27,5 +27,5 @@ export class FilterSettingsF2Component {
   settings!: SettingsStructure
   failedToConnect: boolean = false;
 
-  constructor(public API: ApiServiceService) { }
+  constructor(public API: ApiServiceService) { API.getSettings();}
 }

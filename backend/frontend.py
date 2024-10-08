@@ -2,10 +2,10 @@ import time
 from threading import Thread
 from typing import Union
 from urllib.parse import urlparse, parse_qs
-
+import os
 import cv2
 from dacite import from_dict, Config
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response,send_from_directory
 from flask_cors import CORS
 
 from frame import Frame
@@ -20,16 +20,18 @@ class Frontend:
     enable_frame_update = True
 
     def __init__(self, settings: Settings):
-        log = logging.getLogger('werkzeug')
-        log.setLevel(logging.WARNING)
+        #log = logging.getLogger('werkzeug')
+        #log.setLevel(logging.WARNING)
         self.settings: Settings = settings
         self.is_connected = False
-        self.app = Flask(__name__)
+        self.app = Flask(__name__, static_folder='../frontend/dist/frontend_new/browser')
         CORS(self.app)
         self.run_video = True
         self.define_routes()
         self.start_flask_thread()
         self.stream_to_stop = 0
+
+
 
     def update_frame(self, frame: Frame):
         self.frame = frame
@@ -41,9 +43,17 @@ class Frontend:
         flask_thread.start()
 
     def run_flask(self):
-        self.app.run(debug=False, threaded=True, port=57000, host='0.0.0.0')
+        self.app.run(debug=False, threaded=True, port=8080, host='0.0.0.0')
 
     def define_routes(self):
+        # Serve Angular app
+        @self.app.route('/', defaults={'path': ''})
+        @self.app.route('/<path:path>')
+        def serve(path):
+            if path != "" and os.path.exists(self.app.static_folder + '/' + path):
+                return send_from_directory(self.app.static_folder, path)
+            else:
+                return send_from_directory(self.app.static_folder, 'index.html')
 
         @self.app.route('/api/settings')
         def get_settings():
@@ -66,16 +76,6 @@ class Frontend:
                 from_dict(data_class=SettingsStructure, data=data, config=Config(type_hooks={float: float_hook})))
             return jsonify({'msg': 'got it'})
 
-        @self.app.route('/enableFrameUpdate')
-        def set_enable_frame_update():
-            self.enable_frame_update = True
-            return jsonify({'msg': 'got it'})
-
-        @self.app.route('/disableFrameUpdate')
-        def reset_enable_frame_update():
-            self.enable_frame_update = False
-            return jsonify({'msg': 'got it'})
-
         @self.app.route('/api/action', methods=['POST', 'OPTIONS'])
         def perform_action():
             if request.method == 'OPTIONS':
@@ -89,14 +89,14 @@ class Frontend:
                 print("stopping video")
             return jsonify({"result": is_checked})
 
-        @self.app.route('/video_feed')
+        @self.app.route('/api/video_feed')
         def video_feed():
             ID = request.args.get("ID")
             frame = self.generate_frames(ID)
             return Response(frame,
                             mimetype='multipart/x-mixed-replace; boundary=frame')
 
-        @self.app.route('/setting_change')
+        @self.app.route('/api/setting_change')
         def setting_change():
             url = request.url
             parsed_url = urlparse(url)

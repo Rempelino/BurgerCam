@@ -5,3 +5,4 @@ numpy
 flask
 flask_cors
 dacite
+requests
