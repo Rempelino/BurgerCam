@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from interface import SettingsStructure
 import time_debug
+from multiprocessing import Pool, cpu_count
 
 Line_detection_threshold = 0
 
@@ -26,14 +27,8 @@ class Frame:
 
     def __init__(self, frame, settings: SettingsStructure, lines):
         self.settings = settings
-        # frame = self.rotate_image(frame, 6)
-        #k1 = -settings.fisheye / 1000
-        #k2 = 0.1
-        #p1 = 0.0
-        #p2 = 0.0
-        #frame = self.remove_fisheye(frame, k1, k2, p1, p2)
         self.frame = frame[settings.frame_cutout.min:settings.frame_cutout.max, :]
-
+        time_debug.print_time("cutout frame")
         if self.resize:
             height, width, _ = self.frame.shape
             self.frame_height = 300
@@ -41,6 +36,8 @@ class Frame:
             if self.frame_width > 4096:
                 self.frame_width = 4096
             self.frame = cv2.resize(self.frame, (self.frame_width, self.frame_height))
+
+        cv2.imshow("test", self.frame)
         self.frame_height, self.frame_width, _ = self.frame.shape
 
         self.min_color = np.array([settings.colourFilter.hue.min,
@@ -52,36 +49,7 @@ class Frame:
         self.expected_lines = settings.lines
         self.line_detection_threshold = Line_detection_threshold
         self.lines = lines
-
-    @staticmethod
-    def remove_fisheye(img, k1, k2, p1, p2):
-
-        # Get image dimensions
-        h, w = img.shape[:2]
-
-        # Define camera matrix
-        # Assuming the focal length is half of the image width and the center point is the image center
-        focal_length = w / 2
-        center = (w / 2, h / 2)
-        camera_matrix = np.array(
-            [[focal_length, 0, center[0]],
-             [0, focal_length, center[1]],
-             [0, 0, 1]], dtype=np.float32
-        )
-        # Define distortion coefficients
-        dist_coeffs = np.array([k1, k2, p1, p2, 0], dtype=np.float32)
-
-        # Generate new camera matrix
-        new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(camera_matrix, dist_coeffs, (w, h), 1, (w, h))
-
-        # Undistort the image
-        dst = cv2.undistort(img, camera_matrix, dist_coeffs, None, new_camera_matrix)
-
-        # Crop the image
-        x, y, w, h = roi
-        dst = dst[y:y + h, x:x + w]
-
-        return dst
+        time_debug.print_time("finished initializing")
 
     def get_frame(self, with_rows=False, with_level=False, filter=None):
         if filter is None or filter == 'none':
@@ -105,8 +73,10 @@ class Frame:
     def get_frame_monochrom(self):
         if self.frame_monochrom is not None:
             return self.frame_monochrom
+
         new_frame = cv2.cvtColor(self.get_frame(), cv2.COLOR_BGR2HSV)  # filter works better when using HSV color coding
         self.frame_monochrom = cv2.inRange(new_frame, self.min_color, self.max_color)
+        time_debug.print_time("created monochrom frame")
         return self.frame_monochrom
 
     def get_frame_filtered_1(self):
@@ -124,6 +94,7 @@ class Frame:
                 output[row, start:end] = 255
 
         self.frame_filtered_1 = output
+        time_debug.print_time("applied filter 1")
         return self.frame_filtered_1
 
     def get_frame_filtered_2(self):
@@ -140,6 +111,7 @@ class Frame:
                 output[row, start:end] = 255
 
         self.frame_filtered_2 = np.transpose(output)
+        time_debug.print_time("applied filter 2")
         return self.frame_filtered_2
 
     def get_frame_pixel_sums(self, with_rows=False):
@@ -176,6 +148,7 @@ class Frame:
             return self.frame_collapsed
         # array is normed to values between 0 and 100
         self.frame_collapsed = np.sum(self.get_frame_filtered_2(), 1) / 255 / self.frame_width * 100
+        time_debug.print_time("got frame collapsed")
         return self.frame_collapsed
 
     def add_threshold(self, frame):
@@ -215,3 +188,15 @@ class Frame:
         rotated_image = cv2.warpAffine(image, rotation_matrix, (width, height))
 
         return rotated_image
+
+def process_chunk(args):
+    chunk, filter_threshold = args
+    output = np.zeros_like(chunk, dtype=np.uint8)
+    for row in range(chunk.shape[0]):
+        diff = np.diff(chunk[row], prepend=0, append=0)
+        runs = np.where(diff != 0)[0].reshape(-1, 2)
+        run_lengths = runs[:, 1] - runs[:, 0]
+        valid_runs = runs[run_lengths > filter_threshold]
+        for start, end in valid_runs:
+            output[row, start:end] = 255
+    return output

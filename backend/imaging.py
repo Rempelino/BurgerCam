@@ -27,7 +27,6 @@ class Imaging:
             frame = Frame(self.numpy_image, self.settings.get_settings(), self.line_finder.get_lines())
             self.line_finder.update(frame.get_frame_collapsed(), self.settings.settings.lines)
             time_debug.print_time("lines updated")
-            # self.frontend.update_frame(frame)
             self.plc.send_line_values(self.line_finder.get_line_values())
         self.frontend.update_frame(frame)
         time_debug.print_time("frontend frame updated")

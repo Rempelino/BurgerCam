@@ -62,12 +62,22 @@ class Camera:
         self.write_settings()
         self.camera_is_connected = True
         self.settings.set_cam_connection_state(self.camera_is_connected)
+        self.send_acquisition_command()
 
     def disconnect_camera(self):
         self.cam.close_device()
         self.camera_is_connected = False
         self.settings.set_cam_connection_state(self.camera_is_connected)
 
+    def send_acquisition_command(self):
+        # send command to camera to extract one frame
+        try:
+            self.cam.TriggerSoftware.send_command()
+        except gx.OffLine:
+            print("camera disconnected")
+            self.disconnect_camera()
+        except Exception as e:
+            print(f"error at sending command {e}")
 
     def get_frame(self):
         time_debug.print_time("-----DONE-----")
@@ -80,19 +90,9 @@ class Camera:
         if self.settings.cam_update_request_flag:
             self.write_settings()
 
-        # send command to camera to extract one frame
-        try:
-            self.cam.TriggerSoftware.send_command()
-        except gx.OffLine:
-            print("camera disconnected")
-            self.disconnect_camera()
-            return None
-        except Exception as e:
-            print(f"error at sending command {e}")
-
-
         # retrieve the frame
         raw_image = self.cam.data_stream[0].get_image()
+
         time_debug.print_time("got raw image")
         if raw_image is None:
             print("no frame received. Reconnecting camera")
@@ -100,9 +100,11 @@ class Camera:
             return None
 
         rgb_image = raw_image.convert("RGB")
+        time_debug.print_time("got RGB image")
         rgb_array = rgb_image.get_numpy_array()
+        time_debug.print_time("got RGB array")
         numpy_image = cv2.cvtColor(rgb_array, cv2.COLOR_RGB2BGR)
-        time_debug.print_time("got mnumpy image")
+        time_debug.print_time("got numpy image")
         return numpy_image
 
 

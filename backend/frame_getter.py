@@ -29,7 +29,9 @@ class FrameGetter:
 
     def get_frame(self):
         if use_camera:
-            return self.cam.get_frame()
+            frame = self.cam.get_frame()
+            self.cam.send_acquisition_command()
+            return frame
 
         ret, frame = self.cap.read()
         if ret:
