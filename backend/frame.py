@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
-from interface import SettingsStructure
+
 import time_debug
-from multiprocessing import Pool, cpu_count
+from interface import SettingsStructure
 
 Line_detection_threshold = 0
 
@@ -36,8 +36,8 @@ class Frame:
             if self.frame_width > 4096:
                 self.frame_width = 4096
             self.frame = cv2.resize(self.frame, (self.frame_width, self.frame_height))
-
-        cv2.imshow("test", self.frame)
+        # cv2.imshow("TEST", self.frame)
+        # key = cv2.waitKey(0)
         self.frame_height, self.frame_width, _ = self.frame.shape
 
         self.min_color = np.array([settings.colourFilter.hue.min,
@@ -170,7 +170,7 @@ class Frame:
 
         # Put the text on the image
         for index, line in enumerate(self.lines):
-            text = f'{index+1}:{int(line[1])}%'
+            text = f'{index + 1}:{int(line[1])}%'
             cv2.putText(frame, text, [0, line[0]], font, font_scale, color, thickness, cv2.LINE_AA)
 
         return frame
@@ -188,6 +188,7 @@ class Frame:
         rotated_image = cv2.warpAffine(image, rotation_matrix, (width, height))
 
         return rotated_image
+
 
 def process_chunk(args):
     chunk, filter_threshold = args

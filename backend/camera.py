@@ -62,6 +62,8 @@ class Camera:
         self.write_settings()
         self.camera_is_connected = True
         self.settings.set_cam_connection_state(self.camera_is_connected)
+        while self.cam.data_stream[0].get_image() is not None:
+            print("frame was not none")
         self.send_acquisition_command()
 
     def disconnect_camera(self):
@@ -90,8 +92,13 @@ class Camera:
         if self.settings.cam_update_request_flag:
             self.write_settings()
 
+
+
         # retrieve the frame
         raw_image = self.cam.data_stream[0].get_image()
+
+        # for next frame
+        self.send_acquisition_command()
 
         time_debug.print_time("got raw image")
         if raw_image is None:
@@ -105,6 +112,9 @@ class Camera:
         time_debug.print_time("got RGB array")
         numpy_image = cv2.cvtColor(rgb_array, cv2.COLOR_RGB2BGR)
         time_debug.print_time("got numpy image")
+
+
+
         return numpy_image
 
 

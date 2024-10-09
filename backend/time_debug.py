@@ -1,6 +1,6 @@
 from datetime import  datetime
 
-disable_print = False
+disable_print = True
 print_string = ""
 last_milli_call = 0
 
