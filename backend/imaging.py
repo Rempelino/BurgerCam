@@ -17,7 +17,7 @@ class Imaging:
         self.frontend = frontend
         self.line_finder = LineFinder()
 
-    async def run(self):
+    def run(self):
         if self.frontend.enable_frame_update:
             self.numpy_image = self.frame_getter.get_frame()
         if self.numpy_image is None:
@@ -29,6 +29,5 @@ class Imaging:
             time_debug.print_time("lines updated")
             self.plc.send_line_values(self.line_finder.get_line_values())
         self.frontend.update_frame(frame)
-        time_debug.print_time("frontend frame updated")
-        await self.plc.ready_for_new_frame()
-        time_debug.print_time("plc ready for new frame")
+        time_debug.print_time("imaging done")
+

@@ -20,12 +20,20 @@ class Camera:
             return
         settings: CamSettings = self.settings.get_cam_settings()
         settings = self.validate_settings(settings)
+        # turn off the stream if active
+        if not self.cam.Width.is_writable():
+            self.cam.stream_off()
+        self.cam.Width.set(4096)
+        self.cam.Height.set(settings.frame_cutout.max - settings.frame_cutout.min)
+        self.cam.OffsetY.set(settings.frame_cutout.min)
         print(f'writing cam setting: {settings}')
         self.cam.ReverseX.set(settings.ReverseX)
         self.cam.ReverseY.set(settings.ReverseY)
         self.cam.ExposureTime.set(settings.ExposureTime)
         self.cam.ColorTransformationEnable.set(settings.ColorTransformationEnable)
         self.settings.cam_update_request_flag = False
+        self.cam.stream_on()
+        self.send_acquisition_command()
 
     @staticmethod
     def validate_settings(settings: CamSettings):
@@ -33,6 +41,10 @@ class Camera:
             settings.ExposureTime = 1000000.0
         if settings.ExposureTime < 28.0:
             settings.ExposureTime = 28.0
+
+        settings.frame_cutout.max += settings.frame_cutout.max % 2
+        settings.frame_cutout.min += settings.frame_cutout.min % 2
+
         return settings
 
     def connect_camera(self):
@@ -58,8 +70,8 @@ class Camera:
         self.cam.TriggerMode.set(gx.GxSwitchEntry.ON)
         self.cam.TriggerSource.set(gx.GxTriggerSourceEntry.SOFTWARE)
         # self.cam.data_stream[0].set_acquisition_buffer_number(1)
-        self.cam.stream_on()
         self.write_settings()
+        self.cam.stream_on()
         self.camera_is_connected = True
         self.settings.set_cam_connection_state(self.camera_is_connected)
         while self.cam.data_stream[0].get_image() is not None:
@@ -82,8 +94,6 @@ class Camera:
             print(f"error at sending command {e}")
 
     def get_frame(self):
-        time_debug.print_time("-----DONE-----")
-        time_debug.commit_print()
         time_debug.print_time("starting to get frame")
         if not self.camera_is_connected:
             self.connect_camera()
@@ -92,12 +102,7 @@ class Camera:
         if self.settings.cam_update_request_flag:
             self.write_settings()
 
-
-
-        # retrieve the frame
         raw_image = self.cam.data_stream[0].get_image()
-
-        # for next frame
         self.send_acquisition_command()
 
         time_debug.print_time("got raw image")

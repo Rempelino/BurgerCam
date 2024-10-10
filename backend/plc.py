@@ -15,10 +15,10 @@ class PLC:
         self.socket = None
         self.settings = settings
 
-    async def connect(self):
+    def connect(self):
         try:
-            reader, writer = await asyncio.open_connection(self.host, self.port)
-            self.socket = (reader, writer)
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.connect((self.host, self.port))
             self.settings.set_PLC_connection_state(True)
             print("Connected")
             return True
@@ -26,31 +26,26 @@ class PLC:
             print(f"An error occurred while connecting: {e}")
             return False
 
-    async def send_receive(self):
+    def send_receive(self):
         data = b'0'
         if not self.socket:
-            connected = await self.connect()
+            connected = self.connect()
             if not connected:
                 return None
 
-
-        reader, writer = self.socket
         if self.settings.plc_update_request_flag:
             self.send_command = MessageType.SETTINGS
             self.settings.plc_update_request_flag = False
 
         match self.send_command:
             case MessageType.IDLE:
-                try:
-                    await asyncio.wait_for(self._wait_for_values(), timeout=0.5)
+                if self.new_line_values_available:
                     self.new_line_values_available = False
                     if len(self.line_values) != 0:
                         data = bytes([self.float_to_byte(x) for x in self.line_values])
                         self.send_command = MessageType.LINE_VALUE
                     else:
                         pass
-                except asyncio.TimeoutError:
-                    pass
             case MessageType.REQUEST_SETTINGS:
                 print("requesting settings from plc")
             case MessageType.SETTINGS:
@@ -59,11 +54,9 @@ class PLC:
         data = bytes([self.send_command.value]) + data
 
         try:
-            writer.write(data)
-            await writer.drain()
+            self.socket.sendall(data)
             self.send_command = MessageType.IDLE
-
-            self.received_byte_string = await reader.read(1024)
+            self.received_byte_string = self.socket.recv(1024)
         except ConnectionResetError as e:
             print(f'ConnectionResetError: {e} -> closing connection to PLC')
             self.socket = None
@@ -80,21 +73,11 @@ class PLC:
             self.settings.set_PLC_connection_state(False)
             return
 
-
         if len(self.received_byte_string) != 0:
             self.process_received_data()
 
-    async def ready_for_new_frame(self):
-        while self.new_line_values_available and self.socket:
-            await asyncio.sleep(0)
-
-    async def _wait_for_values(self):
-        while not self.new_line_values_available:
-            await asyncio.sleep(0)
-
-    async def listen(self):
-        while True:
-            await self.send_receive()
+    def listen(self):
+        self.send_receive()
 
     def send_line_values(self, line_values):
         self.line_values = line_values

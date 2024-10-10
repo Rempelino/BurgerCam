@@ -27,7 +27,7 @@ class Frame:
 
     def __init__(self, frame, settings: SettingsStructure, lines):
         self.settings = settings
-        self.frame = frame[settings.frame_cutout.min:settings.frame_cutout.max, :]
+        self.frame = frame#[settings.frame_cutout.min:settings.frame_cutout.max, :]
         time_debug.print_time("cutout frame")
         if self.resize:
             height, width, _ = self.frame.shape

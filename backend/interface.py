@@ -22,14 +22,15 @@ class Settings:
 
 
     def set_settings(self, settings: Union[SettingsStructure, bytearray]):
-        print(f"setting settings to {settings}")
         # settings changed by frontend
         if isinstance(settings, SettingsStructure):
+            print(f"setting settings to {settings}")
             self.validate_settings(settings)
             self.plc_update_request_flag = True
 
         # settings changed by plc
         else:
+            print(f"setting settings to {' '.join([hex(b)[2:].zfill(2) for b in settings])}")
             new_settings, _ = self.bytes_to_dict(settings, self.settings)
             self.validate_settings(new_settings)
         write_dataclass_to_file(self.settings, 'settings_save.pkl')
@@ -49,14 +50,21 @@ class Settings:
         self.settings.filter_1 = clamp(new_settings.filter_1, 0, 30)
         self.settings.filter_2 = clamp(new_settings.filter_2, 0, 30)
 
-        self.settings.frame_cutout = clamp_max_min(new_settings.frame_cutout, 0, 3000, min_distance=50)
+        self.settings.frame_cutout = clamp_max_min(new_settings.cam_settings.frame_cutout, 0, 3000, min_distance=50)
 
     def get_cam_settings(self):
         return self.settings.cam_settings
 
     def dict_to_bytes(self, dictionary):
         bytestream = b''
+        previous_data_type_was_bool = False
         for key, value in dictionary.items():
+
+            if isinstance(value, bool):
+                previous_data_type_was_bool = True
+            if not isinstance(value, bool) and not isinstance(value, dict):
+                previous_data_type_was_bool = False
+
             if isinstance(value, int):
                 new_bytes = struct.pack('<h', value)
                 bytestream += new_bytes
@@ -65,11 +73,16 @@ class Settings:
                 bytestream += new_bytes + b'0'
 
             elif isinstance(value, float):
+                while len(bytestream) % 4 != 0:
+                    bytestream += b'0'
                 new_bytes = struct.pack('<f', value)
                 bytestream += new_bytes
             elif isinstance(value, dict):
                 # every structure starts at a byte dividable by 4
-                while len(bytestream) % 4 != 0:
+                div = 4
+                if previous_data_type_was_bool:
+                    div = 2
+                while len(bytestream) % div != 0:
                     bytestream += b'0'
                 bytestream += self.dict_to_bytes(value)
             else:
@@ -79,27 +92,43 @@ class Settings:
     def bytes_to_dict(self, data, current_settings, index=0):
         new_settings = current_settings
         try:
+            previous_data_type_was_bool = False
             for field in fields(new_settings):
+
+                if field.type == bool:
+                    previous_data_type_was_bool = True
+                if field.type != bool and not is_dataclass(getattr(new_settings, field.name)):
+                    previous_data_type_was_bool = False
+
                 if field.type == int:
                     sub_data = data[index:index + 2]
                     index += 2
                     (new_value,) = struct.unpack('<h', sub_data)
+                    # print(f'setting {field.name} at byte: {index-2} to {new_value}')
                     setattr(new_settings, field.name, new_value)
                 elif field.type == bool:
                     sub_data = data[index:index + 1]
                     index += 2
                     (new_value,) = struct.unpack('<?', sub_data)
+                    # print(f'setting {field.name} at byte: {index - 2} to {new_value}')
                     setattr(new_settings, field.name, new_value)
                 elif field.type == float:
+                    index = index + index % 4
                     sub_data = data[index:index + 4]
                     index += 4
                     (new_value,) = struct.unpack('<f', sub_data)
+                    # print(f'setting {field.name} at byte: {index - 4} to {new_value}')
                     setattr(new_settings, field.name, new_value)
                 elif is_dataclass(getattr(new_settings, field.name)):
-                    # make sure that index is dividable by 4
-                    # because data structs in the plc always start every 4th byte
-                    index = index + index % 4
+                    # make sure that index is dividable by 4 or 2
+                    # because data structs in the plc are always a multiple of 4 or 2 depending on previous dt
+                    if previous_data_type_was_bool:
+                        index = index + index % 2
+                    else:
+                        index = index + index % 4
+                    # print(f'{field.name} at index: {index}')
                     new_value, index = self.bytes_to_dict(data, getattr(new_settings, field.name), index)
+                    index = index + index % 4
                     setattr(new_settings, field.name, new_value)
                 else:
                     print(f"key: {field.name}, of unsupported type {field.type} detected")
