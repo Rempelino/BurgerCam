@@ -1,4 +1,4 @@
-from datetime import  datetime
+from datetime import datetime
 
 disable_print = True
 print_string = ""

@@ -26,7 +26,7 @@
                 [maxValue]="300">
             </app-double-slider>
 
-            <app-double-slider [(value1)]="API.settings.frame_cutout.min" [(value2)]="API.settings.frame_cutout.max"
+            <app-double-slider [(value1)]="API.settings.cam_settings.frame_cutout.min" [(value2)]="API.settings.cam_settings.frame_cutout.max"
                 label1="Min Cutout" label2="Max Cutout" (valueChange)="API.setSettings()" [maxValue]="3000">
             </app-double-slider>
 

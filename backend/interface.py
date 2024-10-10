@@ -33,6 +33,8 @@ class Settings:
             print(f"setting settings to {' '.join([hex(b)[2:].zfill(2) for b in settings])}")
             new_settings, _ = self.bytes_to_dict(settings, self.settings)
             self.validate_settings(new_settings)
+
+        print(f"new settings: {self.settings}")
         write_dataclass_to_file(self.settings, 'settings_save.pkl')
         self.cam_update_request_flag = True
 
@@ -46,10 +48,8 @@ class Settings:
         self.settings.colourFilter.hue = clamp_max_min(new_settings.colourFilter.hue, 0, 255)
         self.settings.colourFilter.saturation = clamp_max_min(new_settings.colourFilter.saturation, 0, 255)
         self.settings.colourFilter.value = clamp_max_min(new_settings.colourFilter.value, 0, 255)
-
         self.settings.filter_1 = clamp(new_settings.filter_1, 0, 30)
         self.settings.filter_2 = clamp(new_settings.filter_2, 0, 30)
-
         self.settings.frame_cutout = clamp_max_min(new_settings.cam_settings.frame_cutout, 0, 3000, min_distance=50)
 
     def get_cam_settings(self):
@@ -156,11 +156,11 @@ def clamp_max_min(n: MaxMin, smallest, largest, min_distance=1):
 
 class MessageType(Enum):
     LINE_VALUE = 0
-    SETTINGS = 1
-    ALIVE = 2
-    REQUEST_SETTINGS = 3
+    SETTINGS_SET = 1
+    # ALIVE = 2
+    SETTINGS_GET = 3
     IDLE = 4
-    PLC_CONFIRM = 5
+    # PLC_CONFIRM = 5
 
 
 def check_dataclass_structure(obj, dataclass_type):

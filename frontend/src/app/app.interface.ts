@@ -1,10 +1,16 @@
 import exp from "constants";
 
+export interface MaxMin {
+    max: number;
+    min: number;
+}
+
 export interface CamSettings{
     ReverseX: boolean;
     ReverseY: boolean;
     ExposureTime: number;
     ColorTransformationEnable: boolean;
+    frame_cutout: MaxMin;
 }
 
 export interface ColourFilter {
@@ -13,10 +19,6 @@ export interface ColourFilter {
     value: MaxMin;
 }
 
-export interface MaxMin {
-    max: number;
-    min: number;
-}
 
 export interface ColourFilter {
     hue: MaxMin;
@@ -34,7 +36,6 @@ export interface SettingsStructure {
     filter_1: number;
     filter_2: number;
     fisheye: number;
-    frame_cutout: MaxMin;
     lines: number;
     cam_settings: CamSettings;
 }

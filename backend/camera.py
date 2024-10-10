@@ -23,17 +23,19 @@ class Camera:
         # turn off the stream if active
         if not self.cam.Width.is_writable():
             self.cam.stream_off()
+
+        # print(f'writing cam setting: {settings}')
+
         self.cam.Width.set(4096)
         self.cam.Height.set(settings.frame_cutout.max - settings.frame_cutout.min)
         self.cam.OffsetY.set(settings.frame_cutout.min)
-        print(f'writing cam setting: {settings}')
         self.cam.ReverseX.set(settings.ReverseX)
         self.cam.ReverseY.set(settings.ReverseY)
         self.cam.ExposureTime.set(settings.ExposureTime)
         self.cam.ColorTransformationEnable.set(settings.ColorTransformationEnable)
         self.settings.cam_update_request_flag = False
         self.cam.stream_on()
-        self.send_acquisition_command()
+        # self.send_acquisition_command()
 
     @staticmethod
     def validate_settings(settings: CamSettings):
@@ -76,7 +78,7 @@ class Camera:
         self.settings.set_cam_connection_state(self.camera_is_connected)
         while self.cam.data_stream[0].get_image() is not None:
             print("frame was not none")
-        self.send_acquisition_command()
+        # self.send_acquisition_command()
 
     def disconnect_camera(self):
         self.cam.close_device()
@@ -107,8 +109,8 @@ class Camera:
 
         time_debug.print_time("got raw image")
         if raw_image is None:
-            print("no frame received. Reconnecting camera")
-            self.disconnect_camera()
+            print("no frame received")
+            # self.disconnect_camera()
             return None
 
         rgb_image = raw_image.convert("RGB")
