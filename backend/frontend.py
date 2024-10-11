@@ -116,7 +116,11 @@ class Frontend:
                                              with_level=param['with_level'] == 'true')
             else:
                 frame = cv2.imread('../Media/noPicAvailable.jpg')
-            ret, buffer = cv2.imencode('.jpg', frame)
+            try:
+                ret, buffer = cv2.imencode('.jpg', frame)
+            except cv2.error:
+                frame = cv2.imread('../Media/noPicAvailable.jpg')
+                ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')

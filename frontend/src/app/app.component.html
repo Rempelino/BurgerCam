@@ -1,7 +1,7 @@
-<!-- Status Bar -->
 <div class="body">
+    <!-- Status Bar-->
     <div *ngIf="API.state" class="status-bar">
-
+        V0.0.0
         <div [ngClass]="API.state.camera_connected ? 'status-item-OK' : 'status-item-FAIL'">
             <mat-icon>photo_camera</mat-icon>
             <span *ngIf="API.state.camera_connected; else cam_disconnected">Cam Connected</span>
@@ -26,7 +26,7 @@
                             <div>Live View</div>
                         </div>
                     </div>
-                </a>                
+                </a>
 
                 <a class="a" mat-list-item routerLink="/filter-settings-colour" routerLinkActive="active">
                     <div class="nav-item-content">
@@ -83,5 +83,6 @@
         <mat-sidenav-content>
             <router-outlet></router-outlet>
         </mat-sidenav-content>
+
     </mat-sidenav-container>
 </div>

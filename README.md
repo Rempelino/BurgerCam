@@ -1,12 +1,12 @@
-# My Full-stack Project
+# Burger Cam
 
-This repository contains both the backend (Python) and frontend (Angular) components of the project.
+This repository contains the backend (Python), frontend (Angular) and an example Sysmac Studio (Omron) project.
 
 ## Structure
 
 - `/backend`: Contains the Python backend project
 - `/frontend`: Contains the Angular frontend project
-- `/PLC Project`: Contains the binary file for a PLC controller.
+- `/PLC Project`: Contains the binary file for an Omron PLC controller.
 
 ## Setup
 
@@ -35,4 +35,8 @@ This repository contains both the backend (Python) and frontend (Angular) compon
 - Backend development is done in the `backend` directory, preferably using PyCharm
 - Frontend development is done in the `frontend` directory, preferably using VS Code
 
-Always make sure you're in the correct directory when running commands or starting your development servers.
+## Setup the Raspbarry
+
+sudo apt-get update
+sudo apt-get install xterm
+
