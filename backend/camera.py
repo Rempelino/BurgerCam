@@ -3,6 +3,7 @@ import cv2
 from interface import Settings
 from interface_definition import CamSettings
 import time_debug
+from dataclasses import replace
 
 
 class Camera:
@@ -10,44 +11,11 @@ class Camera:
     camera_is_connected = False
     device_manager = None
     cam: gx.U3VDevice | None = None
+    last_written_settings = None
 
     def __init__(self, settings: Settings):
         self.settings = settings
         self.connect_camera()
-
-    def write_settings(self):
-        if not self.camera_is_connected:
-            return
-        settings: CamSettings = self.settings.get_cam_settings()
-        settings = self.validate_settings(settings)
-        # turn off the stream if active
-        if not self.cam.Width.is_writable():
-            self.cam.stream_off()
-
-        # print(f'writing cam setting: {settings}')
-
-        self.cam.Width.set(4096)
-        self.cam.Height.set(settings.frame_cutout.max - settings.frame_cutout.min)
-        self.cam.OffsetY.set(settings.frame_cutout.min)
-        self.cam.ReverseX.set(settings.ReverseX)
-        self.cam.ReverseY.set(settings.ReverseY)
-        self.cam.ExposureTime.set(settings.ExposureTime)
-        self.cam.ColorTransformationEnable.set(settings.ColorTransformationEnable)
-        self.settings.cam_update_request_flag = False
-        self.cam.stream_on()
-        # self.send_acquisition_command()
-
-    @staticmethod
-    def validate_settings(settings: CamSettings):
-        if settings.ExposureTime > 1000000.0:
-            settings.ExposureTime = 1000000.0
-        if settings.ExposureTime < 28.0:
-            settings.ExposureTime = 28.0
-
-        settings.frame_cutout.max += settings.frame_cutout.max % 2
-        settings.frame_cutout.min += settings.frame_cutout.min % 2
-
-        return settings
 
     def connect_camera(self):
         self.device_manager = gx.DeviceManager()
@@ -69,16 +37,58 @@ class Camera:
         except gx.OffLine:
             print("Camera disconnected")
             return
-        self.cam.TriggerMode.set(gx.GxSwitchEntry.ON)
-        self.cam.TriggerSource.set(gx.GxTriggerSourceEntry.SOFTWARE)
-        # self.cam.data_stream[0].set_acquisition_buffer_number(1)
-        self.write_settings()
-        self.cam.stream_on()
         self.camera_is_connected = True
         self.settings.set_cam_connection_state(self.camera_is_connected)
+        self.last_written_settings = None
+        self.write_settings()
+
+        # empty frame buffer just in case to prevent delays
         while self.cam.data_stream[0].get_image() is not None:
             print("frame was not none")
-        # self.send_acquisition_command()
+
+    def write_settings(self):
+        if self.last_written_settings == self.settings.get_cam_settings():
+            print("not updating cam settings as they did not change")
+            self.settings.cam_update_request_flag = False
+            return
+        if not self.camera_is_connected:
+            return
+        settings: CamSettings = self.settings.get_cam_settings()
+        settings = self.validate_settings(settings)
+
+        # turn off the stream if active
+        if not self.cam.Width.is_writable():
+            self.cam.stream_off()
+
+        # set all the settings
+        self.cam.TriggerMode.set(gx.GxSwitchEntry.ON)
+        self.cam.TriggerSource.set(gx.GxTriggerSourceEntry.SOFTWARE)
+        self.cam.Width.set(4096)
+        self.cam.Height.set(settings.frame_cutout.max - settings.frame_cutout.min)
+        self.cam.OffsetY.set(settings.frame_cutout.min)
+        self.cam.ReverseX.set(settings.ReverseX)
+        self.cam.ReverseY.set(settings.ReverseY)
+        self.cam.ExposureTime.set(settings.ExposureTime)
+        self.cam.ColorTransformationEnable.set(settings.ColorTransformationEnable)
+        self.settings.cam_update_request_flag = False
+
+        # replace -> deepcopy
+        self.last_written_settings = replace(settings)
+
+        # turn on the stream
+        self.cam.stream_on()
+
+    @staticmethod
+    def validate_settings(settings: CamSettings):
+        if settings.ExposureTime > 1000000.0:
+            settings.ExposureTime = 1000000.0
+        if settings.ExposureTime < 28.0:
+            settings.ExposureTime = 28.0
+
+        settings.frame_cutout.max += settings.frame_cutout.max % 2
+        settings.frame_cutout.min += settings.frame_cutout.min % 2
+
+        return settings
 
     def disconnect_camera(self):
         self.cam.close_device()
@@ -94,6 +104,7 @@ class Camera:
             self.disconnect_camera()
         except Exception as e:
             print(f"error at sending command {e}")
+            self.disconnect_camera()
 
     def get_frame(self):
         time_debug.print_time("starting to get frame")
@@ -102,6 +113,7 @@ class Camera:
             return None
 
         if self.settings.cam_update_request_flag:
+
             self.write_settings()
 
         raw_image = self.cam.data_stream[0].get_image()
