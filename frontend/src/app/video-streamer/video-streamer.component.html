@@ -1,4 +1,4 @@
-<div *ngIf="!disable_component" #videoContainer>
+<div #videoContainer>
     <div *ngIf="optionsAvailable" class="body">
         <mat-form-field>
             <mat-label>Filter</mat-label>
@@ -11,6 +11,12 @@
         <toggle-button [(isTicked)]="with_level" text="with level" (isTickedChange)="onSettingChange()"></toggle-button>
         <toggle-button [(isTicked)]="with_rows" text="with rows" (isTickedChange)="onSettingChange()"></toggle-button>
     </div>
-    <p></p>
-    <img [src]="videoUrl" *ngIf="isStreamEnabled">
+    <div>
+        <div class="loadingSpinner" *ngIf="isLoading">
+            <mat-spinner></mat-spinner>
+            <span>Loading life view...</span>
+        </div>
+        <img [src]="videoUrl" (load)="onImageLoad()" (error)="onImageError()"
+            [ngStyle]="{'display': isLoading ? 'none' : 'block'}">
+    </div>
 </div>

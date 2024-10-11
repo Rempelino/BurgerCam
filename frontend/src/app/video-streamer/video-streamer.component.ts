@@ -8,6 +8,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { ToggleButtonComponent } from '../toggle-button/toggle-button.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 interface Filter {
   value: string;
@@ -23,7 +24,8 @@ interface Filter {
     MatLabel,
     MatSelect,
     MatOption,
-    ToggleButtonComponent
+    ToggleButtonComponent,
+    MatProgressSpinnerModule
   ],
   templateUrl: './video-streamer.component.html',
   styleUrl: './video-streamer.component.scss'
@@ -40,10 +42,9 @@ export class VideoStreamComponent implements OnInit {
   @Input() optionsAvailable: boolean = true;
 
   videoUrl: SafeUrl = '';
-  isStreamEnabled = true;
   url = ''
   enableFrameUpdate = true;
-  disable_component = false;
+  isLoading = true;
 
   filters: Filter[] = [
     {value: 'none', viewValue: 'None'},
@@ -56,19 +57,8 @@ export class VideoStreamComponent implements OnInit {
   constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
-    if (this.disable_component){
-      return;
-    }
-    this.onCheckboxChange();
+    this.videoUrl = this.sanitizer.bypassSecurityTrustUrl(environment.apiUrl + `/video_feed?ID=${this.ID}`);
     this.onSettingChange();
-  }
-
-  onCheckboxChange() {
-    if (this.isStreamEnabled) {
-      this.startStream();
-    } else {
-      this.stopStream();
-    }
   }
 
   onSettingChange() {
@@ -76,17 +66,13 @@ export class VideoStreamComponent implements OnInit {
     fetch(this.url)
   }
 
-  private startStream() {
-    this.url = environment.apiUrl + `/video_feed?ID=${this.ID}`
-    this.updateUrl();
+  onImageLoad() {
+    this.isLoading = false;
   }
 
-  private stopStream() {
-    this.url = "";
-    this.updateUrl();
-  }
-
-  private updateUrl() {
-    this.videoUrl = this.sanitizer.bypassSecurityTrustUrl(this.url);
+  // New method to handle image error event
+  onImageError() {
+    this.isLoading = false;
+    // You might want to show an error message or placeholder image here
   }
 }
