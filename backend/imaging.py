@@ -22,6 +22,7 @@ class Imaging:
             self.numpy_image = self.frame_getter.get_frame()
         if self.numpy_image is None:
             frame = None
+            self.settings.plc_state_update_request_flag = True
         else:
             time_debug.print_time("starting frame process")
             frame = Frame(self.numpy_image, self.settings.get_settings(), self.line_finder.get_lines())

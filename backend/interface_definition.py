@@ -27,6 +27,7 @@ class ColourFilter:
 class State:
     camera_connected: bool = False
     PLC_connected: bool = False
+    frontend_update_required: bool = False
 
 
 @dataclass

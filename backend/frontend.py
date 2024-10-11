@@ -59,13 +59,14 @@ class Frontend:
         def get_settings():
             if request.method == 'OPTIONS':
                 return '', 200
+            self.settings.state.frontend_update_required = False
             return jsonify(self.settings.get_settings())
 
         @self.app.route('/api/state')
         def get_state():
             if request.method == 'OPTIONS':
                 return '', 200
-            return jsonify(self.settings.state)
+            return jsonify(self.settings.get_state())
 
         @self.app.route('/api/set_settings', methods=['POST'])
         def set_settings():

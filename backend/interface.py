@@ -7,7 +7,8 @@ import struct
 
 
 class Settings:
-    plc_update_request_flag = False
+    plc_settings_update_request_flag = False
+    plc_state_update_request_flag = False
     cam_update_request_flag = False
 
     def __init__(self):
@@ -26,13 +27,14 @@ class Settings:
         if isinstance(settings, SettingsStructure):
             print(f"setting settings to {settings}")
             self.validate_settings(settings)
-            self.plc_update_request_flag = True
+            self.plc_settings_update_request_flag = True
 
         # settings changed by plc
         else:
             print(f"setting settings to {' '.join([hex(b)[2:].zfill(2) for b in settings])}")
             new_settings, _ = self.bytes_to_dict(settings, self.settings)
             self.validate_settings(new_settings)
+            self.state.frontend_update_required = True
 
         print(f"new settings: {self.settings}")
         write_dataclass_to_file(self.settings, 'settings_save.pkl')
@@ -42,6 +44,11 @@ class Settings:
         if not as_byte_stream:
             return self.settings
         return self.dict_to_bytes(asdict(self.settings))
+
+    def get_state(self, as_byte_stream=False):
+        if not as_byte_stream:
+            return self.state
+        return self.dict_to_bytes(asdict(self.state))
 
     def validate_settings(self, new_settings: SettingsStructure):
         self.settings = new_settings
@@ -139,9 +146,11 @@ class Settings:
 
     def set_cam_connection_state(self, state):
         self.state.camera_connected = state
+        self.plc_state_update_request_flag = True
 
     def set_PLC_connection_state(self, state):
         self.state.PLC_connected = state
+        self.plc_state_update_request_flag = True
 
 
 def clamp(n, smallest, largest):
@@ -157,10 +166,9 @@ def clamp_max_min(n: MaxMin, smallest, largest, min_distance=1):
 class MessageType(Enum):
     LINE_VALUE = 0
     SETTINGS_SET = 1
-    # ALIVE = 2
     SETTINGS_GET = 3
     IDLE = 4
-    # PLC_CONFIRM = 5
+    STATE_SET = 5
 
 
 def check_dataclass_structure(obj, dataclass_type):

@@ -60,9 +60,13 @@ class PLC:
                 else:
                     pass
             case MessageType.SETTINGS_SET:
-                self.settings.plc_update_request_flag = False
+                self.settings.plc_settings_update_request_flag = False
                 data = self.settings.get_settings(as_byte_stream=True)
                 print("requesting settings")
+            case MessageType.STATE_SET:
+                self.settings.plc_state_update_request_flag = False
+                data = self.settings.get_state(as_byte_stream=True)
+                print("state has been send to PLC")
 
         data = bytes([self.send_command.value]) + data
 
@@ -81,8 +85,10 @@ class PLC:
         if self.send_command == MessageType.IDLE:
             if self.new_line_values_available:
                 self.send_command = MessageType.LINE_VALUE
-            if self.settings.plc_update_request_flag:
+            if self.settings.plc_settings_update_request_flag:
                 self.send_command = MessageType.SETTINGS_SET
+            if self.settings.plc_state_update_request_flag:
+                self.send_command = MessageType.STATE_SET
         return self.send_command != MessageType.IDLE
 
     async def _wait_for_data_to_send(self):
