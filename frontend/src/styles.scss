@@ -3,6 +3,7 @@
 $gray: #333232;
 $light_gray: #ebe8e8;
 $tourquise: #1cc7d0;
+$mango: #ff9933;
 
 html,
 
@@ -37,4 +38,32 @@ body {
 
   label, mat-card-title {
     color: $light_gray;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Ensure it's on top of other elements */
+  }
+  
+  .overlay mat-spinner {
+    background-color: transparent;
+  }
+  
+  .overlay mat-spinner ::ng-deep circle {
+    stroke: $mango !important; /* Red color for the spinner */
+  }
+  
+  .overlay span {
+    margin-top: 20px;
+    color: $light_gray;
+    font-size: 18px;
   }

@@ -1,11 +1,11 @@
-<div class="overlay" *ngIf="failedToConnect">
+<div class="overlay" *ngIf="!API.settings">
     <ng-container>
         <mat-spinner></mat-spinner>
         <span>Waiting for Response...</span>
     </ng-container>
 </div>
 
-<div *ngIf="!failedToConnect&&API.settings">
+<div *ngIf="API.settings">
     <div class="mat-card-container">
         <mat-card>
             <mat-card-title>Live View</mat-card-title>

@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { VideoStreamComponent } from '../video-streamer/video-streamer.component';
 import { CommonModule } from '@angular/common';
 import { ApiServiceService } from '../api.service';
-import { firstValueFrom } from 'rxjs';
 import { SettingsStructure } from '../app.interface';
 import { MatCard, MatCardContent, MatCardTitle } from '@angular/material/card';
 import { DoubleSliderComponent } from "../double-slider/double-slider.component";
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 @Component({
@@ -16,7 +16,8 @@ import { DoubleSliderComponent } from "../double-slider/double-slider.component"
     MatCard,
     MatCardTitle,
     DoubleSliderComponent,
-    MatCardContent
+    MatCardContent,
+    MatProgressSpinnerModule
   ],
   templateUrl: './filter-settings-colour.component.html',
   styleUrl: './filter-settings-colour.component.scss'

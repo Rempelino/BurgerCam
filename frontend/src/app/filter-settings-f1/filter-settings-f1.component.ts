@@ -4,8 +4,8 @@ import { VideoStreamComponent } from '../video-streamer/video-streamer.component
 import { DoubleSliderComponent } from "../double-slider/double-slider.component";
 import { MatCard, MatCardContent, MatCardTitle } from '@angular/material/card';
 import { SettingsStructure } from '../app.interface';
-import { firstValueFrom } from 'rxjs';
 import { ApiServiceService } from '../api.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-filter-settings-f1',
@@ -16,7 +16,8 @@ import { ApiServiceService } from '../api.service';
     DoubleSliderComponent,
     MatCard,
     MatCardTitle,
-    MatCardContent
+    MatCardContent,
+    MatProgressSpinnerModule
   ],
   templateUrl: './filter-settings-f1.component.html',
   styleUrl: './filter-settings-f1.component.scss'

@@ -1,8 +1,9 @@
-<div *ngIf="failedToConnect||!API.settings">
-    Connection to backend failed
+<div class="overlay" *ngIf="!API.settings">
+    <ng-container>
+        <mat-spinner></mat-spinner>
+        <span>Waiting for Response...</span>
+    </ng-container>
 </div>
-
-
 
 <div *ngIf="!failedToConnect&&API.settings">
     <div class="mat-card-container">

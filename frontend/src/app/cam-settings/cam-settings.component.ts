@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { VideoStreamComponent } from '../video-streamer/video-streamer.component';
 import { DoubleSliderComponent } from '../double-slider/double-slider.component';
-import { SettingsStructure } from '../app.interface';
-import { firstValueFrom, interval, Subscription } from 'rxjs';
 import { ApiServiceService } from '../api.service';
 import { MatCard, MatCardContent, MatCardTitle } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
@@ -11,7 +9,6 @@ import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToggleButtonComponent } from '../toggle-button/toggle-button.component';
-import { appendFile } from 'fs';
 
 @Component({
   selector: 'app-cam-settings',
@@ -32,7 +29,6 @@ import { appendFile } from 'fs';
   styleUrl: './cam-settings.component.scss'
 })
 export class CamSettingsComponent {
-  failedToConnect: boolean = false;
 
   constructor(public API: ApiServiceService) { API.getSettings();}
 }
