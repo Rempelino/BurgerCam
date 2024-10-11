@@ -29,6 +29,7 @@ export interface ColourFilter {
 export interface State {
     camera_connected: boolean;
     PLC_connected: boolean;
+    frontend_update_required: boolean;
 }
 
 export interface SettingsStructure {
