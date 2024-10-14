@@ -1,3 +1,57 @@
 @use '../../styles.scss' as gs;
 
+.logging-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; // Adds space between flex items
+  
+    button {
+      align-self: flex-start; // Aligns buttons to the start of the flex container
+    }
+  
+    .loadingSpinner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+  
+      mat-spinner {
+        width: 24px !important;
+        height: 24px !important;
+      }
+    }
+  }
 
+.action_button {
+    color: gs.$gray !important;
+    background-color: gs.$light_gray !important;
+    border-radius: 0px;
+  }
+
+.loadingSpinner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1; /* Ensure it's on top of the image */
+}
+
+.loadingSpinner mat-spinner {
+    background-color: transparent;
+}
+
+.loadingSpinner mat-spinner ::ng-deep circle {
+    stroke: gs.$mango !important; /* Mango color for the spinner */
+}
+
+.loadingSpinner span {
+    margin-top: 20px;
+    color: gs.$light_gray;
+    font-size: 18px;
+}

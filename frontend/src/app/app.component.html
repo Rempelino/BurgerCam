@@ -1,7 +1,7 @@
 <div class="body">
     <!-- Status Bar-->
     <div *ngIf="API.state" class="status-bar">
-        V0.0.2
+        V0.0.3
         <div [ngClass]="API.state.camera_connected ? 'status-item-OK' : 'status-item-FAIL'">
             <mat-icon>photo_camera</mat-icon>
             <span *ngIf="API.state.camera_connected; else cam_disconnected">Cam Connected</span>
@@ -12,6 +12,11 @@
             <mat-icon>developer_board</mat-icon>
             <span *ngIf="API.state.PLC_connected; else plc_disconnected">PLC Connected</span>
             <ng-template #plc_disconnected>PLC Disconnected</ng-template>
+        </div>
+
+        <div *ngIf="API.state.replay_active" class="status-item-yellow">
+            <mat-icon>replay</mat-icon>
+            <span>Replay active</span>
         </div>
     </div>
     <!--Side Navigation Bar-->

@@ -30,6 +30,10 @@ export interface State {
     camera_connected: boolean;
     PLC_connected: boolean;
     frontend_update_required: boolean;
+    logging_active: boolean;
+    saving_active: boolean;
+    replay_active: boolean;
+    log_progress: number;
 }
 
 export interface SettingsStructure {

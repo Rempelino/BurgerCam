@@ -1,36 +1,29 @@
 import cv2
-import time
 from camera import Camera
-from interface import Settings
+from interface import Interface
+from log import Log
 
 
 
-use_camera = True
+
 class FrameGetter:
     last_frame = None
     frame_counter = 0
-    def __init__(self, video_path, settings: Settings):
-        """
-        Initialize the FrameGetter.
-        :param video_path: String path to the video file
-        """
-        if use_camera:
-            self.cam = Camera(settings)
-        else:
-            for index, path in enumerate(video_path):
-                self.cap = cv2.VideoCapture(path)
-                if self.cap.isOpened():
-                    print(f"able to open path {path}")
-                    self.video_path = path
-                    break
-                if index == len(video_path) - 1:
-                    print("video could not be opened")
-                    exit()
+    video_active = False
+
+    def __init__(self, video_path, settings: Interface, log: Log):
+        self.cam = Camera(settings)
+        self.log = log
+
+
 
     def get_frame(self):
-        if use_camera:
+        if not self.log.replay_active:
             frame = self.cam.get_frame()
             return frame
+
+        if not self.video_active:
+            self.init_video()
 
         ret, frame = self.cap.read()
         if ret:
@@ -38,6 +31,12 @@ class FrameGetter:
             return self.last_frame
         else:
             self.cap.release()
-            self.cap = cv2.VideoCapture(self.video_path)
+            self.video_active = True
+            self.init_video()
             return self.last_frame
+
+    def init_video(self):
+        self.cap = cv2.VideoCapture(self.log.replay_path)
+        if self.cap.isOpened():
+            self.video_active = True
 

@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, DoCheck } from '@angular/core';
 import { VideoStreamComponent } from '../video-streamer/video-streamer.component';
 import { MatCard, MatCardContent, MatCardTitle } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { ApiServiceService } from '../api.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatOption, MatSelect } from '@angular/material/select';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-live-view',
@@ -13,11 +17,50 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatCardContent,
     MatCardTitle,
     CommonModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatProgressBarModule,
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    MatOption,
+    MatButton
   ],
   templateUrl: './live-view.component.html',
   styleUrl: './live-view.component.scss'
 })
-export class LiveViewComponent {
-  constructor(public API: ApiServiceService) { API.getSettings();}
+export class LiveViewComponent implements DoCheck {
+
+  chosen_log: string = ''
+  private previousSaveActive: boolean = false
+
+  constructor(public API: ApiServiceService) {
+    API.getSettings();
+    API.getAvailableLogs();
+  }
+
+  ngDoCheck() {
+    if (!this.API.dataOK()){
+      return;
+    }
+    if (this.API.state.saving_active !== this.previousSaveActive) {
+      if (this.previousSaveActive === true && this.API.state.saving_active === false) {
+        this.API.getAvailableLogs()
+
+      }
+      this.previousSaveActive = this.API.state.saving_active;
+    }
+  }
+  startLogging() {
+    this.API.startLog();
+  }
+
+  toggleReplay() {
+    if (!this.API.state.replay_active) {
+      if (this.chosen_log != '') {
+        this.API.startReplay(this.chosen_log);
+      }
+    } else {
+      this.API.stopReplay();
+    }
+  }
 }

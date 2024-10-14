@@ -9,7 +9,8 @@ from flask import Flask, jsonify, request, Response,send_from_directory
 from flask_cors import CORS
 
 from frame import Frame
-from interface import Settings, SettingsStructure
+from interface import Interface, SettingsStructure
+from log import Log
 import logging
 
 
@@ -17,12 +18,11 @@ class Frontend:
     frame: Frame = None
     frame_has_changed = False
     streams = []
-    enable_frame_update = True
 
-    def __init__(self, settings: Settings):
-        log = logging.getLogger('werkzeug')
-        log.setLevel(logging.WARNING)
-        self.settings: Settings = settings
+    def __init__(self, settings: Interface, log: Log):
+        logger = logging.getLogger('werkzeug')
+        logger.setLevel(logging.WARNING)
+        self.settings: Interface = settings
         self.is_connected = False
         self.app = Flask(__name__, static_folder='../frontend/dist/frontend_new/browser')
         CORS(self.app)
@@ -30,6 +30,7 @@ class Frontend:
         self.define_routes()
         self.start_flask_thread()
         self.stream_to_stop = 0
+        self.log = log
 
 
 
@@ -55,18 +56,43 @@ class Frontend:
             else:
                 return send_from_directory(self.app.static_folder, 'index.html')
 
-        @self.app.route('/api/settings')
+        @self.app.route('/api/get_settings')
         def get_settings():
             if request.method == 'OPTIONS':
                 return '', 200
             self.settings.state.frontend_update_required = False
             return jsonify(self.settings.get_settings())
 
-        @self.app.route('/api/state')
+        @self.app.route('/api/get_state')
         def get_state():
             if request.method == 'OPTIONS':
                 return '', 200
             return jsonify(self.settings.get_state())
+
+        @self.app.route('/api/start_log')
+        def start_log():
+            if request.method == 'OPTIONS':
+                return '', 200
+            self.log.start_log()
+            return jsonify("command", "received")
+
+        @self.app.route('/api/start_replay', methods=['POST'])
+        def start_replay():
+            data = request.get_json()
+            self.log.start_replay(data['replay'])
+            return jsonify({'msg': 'got it'})
+
+        @self.app.route('/api/stop_replay')
+        def stop_replay():
+            self.log.stop_replay()
+            return jsonify({'msg': 'got it'})
+
+        @self.app.route('/api/get_available_logs')
+        def get_available_logs():
+            if request.method == 'OPTIONS':
+                return '', 200
+            data = os.listdir('Log')
+            return jsonify(data)
 
         @self.app.route('/api/set_settings', methods=['POST'])
         def set_settings():
@@ -104,7 +130,7 @@ class Frontend:
             params = parse_qs(parsed_url.query)
             params = {k: v[0] if v else None for k, v in params.items()}  # remove the lists that are present by default
             self.set_params(params)
-            return jsonify({"msg": "updated settings"})
+            return jsonify({"msg": "updated interface"})
 
     def generate_frames(self, ID):
         ts = time.time()

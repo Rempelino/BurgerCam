@@ -1,16 +1,51 @@
-<div class="overlay" *ngIf="!API.settings">
+<div class="overlay" *ngIf="!API.dataOK()">
     <ng-container>
         <mat-spinner></mat-spinner>
         <span>Waiting for Response...</span>
     </ng-container>
 </div>
 
-<div *ngIf="API.settings" class="mat-card-container">
+<div *ngIf="API.dataOK()" class="mat-card-container">
     <mat-card>
         <mat-card-title>Live View</mat-card-title>
         <mat-card-content>
             <app-video-streamer [checkBoxLabel]="'raw video'" [ID]="'1'" [with_level]="true"
                 [with_rows]="true"></app-video-streamer>
+        </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+        <mat-card-title>Logging</mat-card-title>
+        <mat-card-content>
+            <div class="logging-controls">
+                <button mat-raised-button (click)="startLogging()" [disabled]="API.state.logging_active">
+                    {{ API.state.logging_active ? 'Logging...' : 'Start Logging' }}
+                </button>
+                <!--mat-progress-bar *ngIf="API.state.logging_active" mode="determinate"
+                [value]="API.state.log_progress"></mat-progress-bar-->
+
+                <button mat-raised-button (click)="toggleReplay()"
+                    [disabled]="chosen_log == '' && !API.state.replay_active">
+                    {{ API.state.replay_active ? 'Stop Replay' : 'Start Replay' }}
+                </button>
+
+                <mat-form-field>
+                    <mat-label>Choose log</mat-label>
+                    <mat-select [(value)]="chosen_log">
+                        @for (f of API.availableLogs; track f) {
+                        <mat-option [value]="f">{{f}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                <div>
+                    <div class="loadingSpinner" *ngIf="API.state.logging_active || API.state.saving_active">
+                        <mat-spinner></mat-spinner>
+                        <span *ngIf="API.state.logging_active">Logging...</span>
+                        <span *ngIf="API.state.saving_active">Saving Log...</span>
+                        <span>{{ API.state.log_progress | number:'1.1-1' }}%</span>
+                    </div>
+                </div>
+            </div>
         </mat-card-content>
     </mat-card>
 </div>

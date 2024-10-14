@@ -1,16 +1,18 @@
 import asyncio
 from plc import PLC
 from frontend import Frontend
-from interface import Settings
+from interface import Interface
 from imaging import Imaging
 from constants import IP_PLC
+from log import Log
 import time_debug
 
-
-settings = Settings()
+settings = Interface()
+log = Log(settings)
 plc = PLC(IP_PLC, 2100, settings)
-frontend = Frontend(settings)
-imaging = Imaging(settings, plc, frontend)
+frontend = Frontend(settings, log)
+imaging = Imaging(settings, plc, frontend, log)
+
 
 
 async def image_processing():

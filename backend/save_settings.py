@@ -28,7 +28,7 @@ def read_dataclass_from_file(cls: Type[T], filename: str) -> T:
         with open(filename, 'rb') as file:
             obj = pickle.load(file)
     except FileNotFoundError:
-        print("settings not found")
+        print("interface not found")
         return None
 
     if not isinstance(obj, cls):

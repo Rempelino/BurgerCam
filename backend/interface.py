@@ -1,39 +1,43 @@
-from dataclasses import asdict, fields, is_dataclass
-from typing import Union
-from enum import Enum
-from save_settings import write_dataclass_to_file, read_dataclass_from_file
-from interface_definition import SettingsStructure, MaxMin, ColourFilter, CamSettings, State
 import struct
+from dataclasses import asdict, fields, is_dataclass
+from enum import Enum
+from typing import Union
+
+from interface_definition import SettingsStructure, MaxMin, State
+from save_settings import write_dataclass_to_file, read_dataclass_from_file
 
 
-class Settings:
+class Interface:
     plc_settings_update_request_flag = False
     plc_state_update_request_flag = False
     cam_update_request_flag = False
+    plc_settings_download_request_flag = False
 
     def __init__(self):
         try:
             self.settings = read_dataclass_from_file(SettingsStructure, 'settings_save.pkl')
         except AttributeError:
             self.settings = None
+            print("unable to read dataclass from file")
         if not check_dataclass_structure(self.settings, SettingsStructure):
+            print("dataclass structure of file was incorrect. Applying defaults.")
             self.settings = SettingsStructure()
         self.validate_settings(self.settings)
         self.state = State()
 
-
     def set_settings(self, settings: Union[SettingsStructure, bytearray]):
-        # settings changed by frontend
+        # interface changed by frontend
         if isinstance(settings, SettingsStructure):
             print(f"setting settings to {settings}")
             self.validate_settings(settings)
             self.plc_settings_update_request_flag = True
 
-        # settings changed by plc
+        # interface changed by plc
         else:
             print(f"setting settings to {' '.join([hex(b)[2:].zfill(2) for b in settings])}")
             new_settings, _ = self.bytes_to_dict(settings, self.settings)
             self.validate_settings(new_settings)
+            self.plc_settings_download_request_flag = False
             self.state.frontend_update_required = True
 
         print(f"new settings: {self.settings}")
@@ -50,6 +54,9 @@ class Settings:
             return self.state
         return self.dict_to_bytes(asdict(self.state))
 
+    def get_settings_from_PLC(self):
+        self.plc_settings_download_request_flag = True
+
     def validate_settings(self, new_settings: SettingsStructure):
         self.settings = new_settings
         self.settings.colourFilter.hue = clamp_max_min(new_settings.colourFilter.hue, 0, 255)
@@ -57,7 +64,8 @@ class Settings:
         self.settings.colourFilter.value = clamp_max_min(new_settings.colourFilter.value, 0, 255)
         self.settings.filter_1 = clamp(new_settings.filter_1, 0, 30)
         self.settings.filter_2 = clamp(new_settings.filter_2, 0, 30)
-        self.settings.frame_cutout = clamp_max_min(new_settings.cam_settings.frame_cutout, 0, 3000, min_distance=50)
+        self.settings.cam_settings.frame_cutout = clamp_max_min(new_settings.cam_settings.frame_cutout, 0, 3000,
+                                                                min_distance=50)
 
     def get_cam_settings(self):
         return self.settings.cam_settings
@@ -152,6 +160,11 @@ class Settings:
         self.state.PLC_connected = state
         self.plc_state_update_request_flag = True
 
+    def set_log_state(self, logging_active=False, replay_active=False, saving_active=False, progress=0.0):
+        self.state.logging_active = logging_active
+        self.state.replay_active = replay_active
+        self.state.log_progress = progress
+        self.state.saving_active = saving_active
 
 def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))
@@ -182,7 +195,7 @@ def check_dataclass_structure(obj, dataclass_type):
 
 
 if __name__ == '__main__':
-    settings = Settings()
+    settings = Interface()
     settings.set_settings(bytearray(b'\x00\x16\x00\x00\x00\xf7\x00B\x00\xff\x008\x00\x05\x00\x05\x08\xfc\x03 '))
     print(settings.get_settings(as_byte_stream=True))
     print(settings.get_settings(as_byte_stream=False))

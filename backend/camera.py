@@ -1,6 +1,6 @@
 import gxipy as gx
 import cv2
-from interface import Settings
+from interface import Interface
 from interface_definition import CamSettings
 import time_debug
 from dataclasses import replace
@@ -13,9 +13,11 @@ class Camera:
     cam: gx.U3VDevice | None = None
     last_written_settings = None
 
-    def __init__(self, settings: Settings):
+    def __init__(self, settings: Interface):
         self.settings = settings
         self.connect_camera()
+        if not self.camera_is_connected:
+            print("unable to connect camera")
 
     def connect_camera(self):
         self.device_manager = gx.DeviceManager()
@@ -25,7 +27,6 @@ class Camera:
             print("Please remove other USB devices to connect to camera")
             return
         if dev_num == 0:
-            print("no camera connected")
             return
         try:
             self.cam = self.device_manager.open_device_by_index(1)
@@ -48,7 +49,7 @@ class Camera:
 
     def write_settings(self):
         if self.last_written_settings == self.settings.get_cam_settings():
-            print("not updating cam settings as they did not change")
+            print("not updating cam interface as they did not change")
             self.settings.cam_update_request_flag = False
             return
         if not self.camera_is_connected:
@@ -60,7 +61,7 @@ class Camera:
         if not self.cam.Width.is_writable():
             self.cam.stream_off()
 
-        # set all the settings
+        # set all the interface
         self.cam.TriggerMode.set(gx.GxSwitchEntry.ON)
         self.cam.TriggerSource.set(gx.GxTriggerSourceEntry.SOFTWARE)
         self.cam.Width.set(4096)

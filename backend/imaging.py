@@ -2,24 +2,26 @@ from frame import Frame
 from frame_getter import FrameGetter
 from frontend import Frontend
 from plc import PLC
-from interface import Settings
+from interface import Interface
 from constants import path_video
 from line_finder import LineFinder
+from log import Log
 import time_debug
 
 
 class Imaging:
-    def __init__(self, settings: Settings, plc: PLC, frontend: Frontend):
+    def __init__(self, settings: Interface, plc: PLC, frontend: Frontend, log: Log):
         self.settings = settings
         self.plc = plc
-        self.frame_getter = FrameGetter(path_video, settings)
+        self.frame_getter = FrameGetter(path_video, settings, log)
         self.numpy_image = self.frame_getter.get_frame()
         self.frontend = frontend
         self.line_finder = LineFinder()
+        self.log = log
 
     def run(self):
-        if self.frontend.enable_frame_update:
-            self.numpy_image = self.frame_getter.get_frame()
+        self.numpy_image = self.frame_getter.get_frame()
+        self.log.update_frame(self.numpy_image)
         if self.numpy_image is None:
             frame = None
             self.settings.plc_state_update_request_flag = True

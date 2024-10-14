@@ -9,7 +9,8 @@
 }
 
 .status-item-OK,
-.status-item-FAIL {
+.status-item-FAIL,
+.status-item-yellow {
     display: flex;
     align-items: center;
     margin-left: 10px;
@@ -23,6 +24,9 @@
     background-color: #c72222;
 }
 
+.status-item-yellow {
+    background-color: gs.$light_gray;
+}
 mat-sidenav {
     color: #4287f5;
     background-color: gs.$gray;

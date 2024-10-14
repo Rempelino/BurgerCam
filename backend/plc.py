@@ -62,7 +62,7 @@ class PLC:
             case MessageType.SETTINGS_SET:
                 self.settings.plc_settings_update_request_flag = False
                 data = self.settings.get_settings(as_byte_stream=True)
-                print("requesting settings")
+                print("requesting interface")
             case MessageType.STATE_SET:
                 self.settings.plc_state_update_request_flag = False
                 data = self.settings.get_state(as_byte_stream=True)
@@ -89,6 +89,8 @@ class PLC:
                 self.send_command = MessageType.SETTINGS_SET
             if self.settings.plc_state_update_request_flag:
                 self.send_command = MessageType.STATE_SET
+            if self.settings.plc_settings_download_request_flag:
+                self.send_command = MessageType.SETTINGS_GET
         return self.send_command != MessageType.IDLE
 
     async def _wait_for_data_to_send(self):
