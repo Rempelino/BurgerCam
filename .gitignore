@@ -1,5 +1,9 @@
 PLC Project.smc2.backup
 settings_save.pkl
+
+
+
+
 # Python
 __pycache__/
 *.py[cod]
