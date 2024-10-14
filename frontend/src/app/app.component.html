@@ -1,7 +1,7 @@
 <div class="body">
     <!-- Status Bar-->
     <div *ngIf="API.state" class="status-bar">
-        {{version}}
+        V{{version}}
         <div [ngClass]="API.state.camera_connected ? 'status-item-OK' : 'status-item-FAIL'">
             <mat-icon>photo_camera</mat-icon>
             <span *ngIf="API.state.camera_connected; else cam_disconnected">Cam Connected</span>
