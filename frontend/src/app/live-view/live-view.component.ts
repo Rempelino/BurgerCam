@@ -8,6 +8,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatButton } from '@angular/material/button';
+import versionInfo from '../../version.json';
 
 @Component({
   selector: 'app-live-view',
@@ -29,7 +30,7 @@ import { MatButton } from '@angular/material/button';
   styleUrl: './live-view.component.scss'
 })
 export class LiveViewComponent implements DoCheck {
-
+  version: string = versionInfo.version;
   chosen_log: string = ''
   private previousSaveActive: boolean = false
 
