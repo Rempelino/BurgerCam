@@ -39,6 +39,10 @@ class Log:
             asyncio.gather(*tasks)
 
     def start_log(self):
+        #create directory if it doesnt exist
+        if "Log" not in os.listdir():
+            os.mkdir("Log")
+
         self.remove_old_logs()
         self.interface.set_log_state(True, False, 0.0)
         self.frames = []
