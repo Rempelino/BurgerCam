@@ -16,6 +16,8 @@ import { SettingsStructure } from './app.interface';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { ApiServiceService } from './api.service';
 import { Subscription, interval } from 'rxjs';
+import versionInfo from '../version.json';
+
 
 @Component({
   selector: 'app-root',
@@ -33,6 +35,7 @@ import { Subscription, interval } from 'rxjs';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+  version: string = versionInfo.version;
   constructor(public API: ApiServiceService) { }
   title = 'Burger Cam';
 }
