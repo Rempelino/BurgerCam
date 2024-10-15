@@ -56,34 +56,34 @@ fi
 echo "----------------------------------------------------------------------------"
 echo "---------------------------Updating pakage list-----------------------------"
 echo "----------------------------------------------------------------------------"
-# sudo apt-get update
+sudo apt-get update
 
 echo "----------------------------------------------------------------------------"
 echo "---------------------------Downloading Project from github------------------"
 echo "----------------------------------------------------------------------------"
-# sudo rm -rf BurgerCam
-# git clone https://github.com/Rempelino/BurgerCam.git
+sudo rm -rf BurgerCam
+git clone https://github.com/Rempelino/BurgerCam.git
 
 echo "----------------------------------------------------------------------------"
 echo "---------------------------creating virtual enviroment----------------------"
 echo "----------------------------------------------------------------------------"
-# sudo apt-get update
-# cd ~/BurgerCam/backend/ && python3 -m venv venv
+sudo apt-get update
+cd ~/BurgerCam/backend/ && python3 -m venv venv
 
 echo "---------------------------------------------------------------------------"
 echo "---------------------------downloading python pakages-----------------------"
 echo "----------------------------------------------------------------------------"
-#cd ~/BurgerCam/backend && source venv/bin/activate && pip install -r requirements.txt
+cd ~/BurgerCam/backend && source venv/bin/activate && pip install -r requirements.txt
 
 echo "---------------------------------------------------------------------------"
 echo "---------------------------installing npm-------------------------------"
 echo "----------------------------------------------------------------------------"
-# sudo apt install nodejs npm
+sudo apt install nodejs npm
 
 echo "---------------------------------------------------------------------------"
 echo "---------------------------setting up autostart procedure------------------"
 echo "----------------------------------------------------------------------------"
-# sudo rm -rf ~/.config/autostart
+sudo rm -rf ~/.config/autostart
 sudo apt install xterm
 cd ~/.config && mkdir "autostart"
 cp ~/BurgerCam/Production/Execute.desktop ~/.config/autostart/
