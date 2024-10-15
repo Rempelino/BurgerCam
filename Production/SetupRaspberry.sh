@@ -103,12 +103,8 @@ chmod +x ~/BurgerCam/Production/RunWithoutUpdate.sh
 echo "---------------------------------------------------------------------------"
 echo "-----------------installing Galaxy Viewer (required for cam driver)--------"
 echo "---------------------------------------------------------------------------"
-cd ~/BurgerCam/GalaxyViewerLinux chmod +x Galaxy_camera.run
+cd ~/BurgerCam/GalaxyViewerLinux && chmod +x Galaxy_camera.run
 cd ~/BurgerCam/GalaxyViewerLinux && sudo ./Galaxy_camera.run
-
-
-
-
 
 nmcli device connect eth0
 nmcli radio wifi on
