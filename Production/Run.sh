@@ -5,8 +5,8 @@ run_in_terminal() {
     shift
     xterm -title "$title" -e bash -c "
     $*
-    echo 'Process finished'
-    sleep 9
+    echo 'Process finished. Press any key to exit...'
+    read -n 1 -s -r -p ''
     "
 }
 run_in_terminal "Burger Cam" "
@@ -83,6 +83,6 @@ echo \"Ethernet enabled and WiFi disabled.\"
 echo \"----------------------------------------------------------------------------\"
 echo \"---------------------------Starting Burger Cam------------------------------\"
 echo \"----------------------------------------------------------------------------\"
-cd ~/BurgerCam
-venv/bin/python backend/main.py
+cd ~/BurgerCam/backend
+venv/bin/python main.py
 "

@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Exec=/home/ghd/Run.sh
+Exec=/home/ghd/BurgerCam/Production/Run.sh
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
