@@ -160,11 +160,10 @@ class Interface:
         self.state.PLC_connected = state
         self.plc_state_update_request_flag = True
 
-    def set_log_state(self, logging_active=False, replay_active=False, saving_active=False, progress=0.0):
+    def set_log_state(self, logging_active=False, replay_active=False, progress=0.0):
         self.state.logging_active = logging_active
         self.state.replay_active = replay_active
         self.state.log_progress = progress
-        self.state.saving_active = saving_active
 
 def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))

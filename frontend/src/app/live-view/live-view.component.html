@@ -39,10 +39,9 @@
                     </mat-select>
                 </mat-form-field>
                 <div>
-                    <div class="loadingSpinner" *ngIf="API.state.logging_active || API.state.saving_active">
+                    <div class="loadingSpinner" *ngIf="API.state.logging_active">
                         <mat-spinner></mat-spinner>
-                        <span *ngIf="API.state.logging_active">Logging...</span>
-                        <span *ngIf="API.state.saving_active">Saving Log...</span>
+                        <span>Logging...</span>
                         <span>{{ API.state.log_progress | number:'1.1-1' }}%</span>
                     </div>
                 </div>

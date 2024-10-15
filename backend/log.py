@@ -6,17 +6,16 @@ import os
 import cv2
 import shutil
 from pathlib import Path
-import asyncio
 
 
 class Log:
     logging_active = False
     replay_active = False
     replay_path = None
-    frames = None
     log_time = timedelta(seconds=60)
     time_stamp = None
     start_time = None
+    video_writer = None
 
     def __init__(self, interface: Interface):
         self.interface = interface
@@ -24,26 +23,44 @@ class Log:
     def update_frame(self, frame):
         if not self.logging_active:
             return
-        self.frames.append(frame)
 
         elapsed_time = datetime.now() - self.start_time
         progress_percentage = (elapsed_time / self.log_time) * 100
         self.interface.set_log_state(logging_active=True, progress=progress_percentage)
 
+        if self.video_writer is None:
+            fps = 20
+            output_path = f'Log/{self.time_stamp}/video.mp4'
+            height, width = frame.shape[:2]
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            self.video_writer = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+
+
+        if len(frame.shape) == 2:  # Grayscale
+            frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+        elif frame.shape[2] == 3:  # Assuming it's already BGR
+            pass
+        elif frame.shape[2] == 4:  # RGBA
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)
+        else:
+            raise ValueError(f"Unsupported image shape: {frame.shape}")
+        self.video_writer.write(frame)
+
 
         if datetime.now() - self.start_time > self.log_time:
+            output_path = f'Log/{self.time_stamp}/video.mp4'
+            self.video_writer.release()
+            self.video_writer = None
+            print(f"Video saved to {output_path}")
+            self.interface.set_log_state(logging_active=False)
             self.logging_active = False
-            tasks = [
-                asyncio.create_task(self.save_video())
-            ]
-            asyncio.gather(*tasks)
 
     def start_log(self):
         #create directory if it doesnt exist
         if "Log" not in os.listdir():
             os.mkdir("Log")
 
-        self.remove_old_logs()
+        # self.remove_old_logs()
         self.interface.set_log_state(True, False, 0.0)
         self.frames = []
         self.logging_active = True
@@ -60,38 +77,6 @@ class Log:
         except Exception as e:
             print(f"An error occurred: {e}")
         write_dataclass_to_file(self.interface.get_settings(), f'Log/{self.time_stamp}/settings.pkl')
-
-    async def save_video(self):
-        self.interface.set_log_state(saving_active=True)
-        fps = len(self.frames) / self.log_time.seconds
-        images = self.frames
-        output_path = f'Log/{self.time_stamp}/video.mp4'
-
-        if not images:
-            raise ValueError("The list of images is empty")
-
-        height, width = images[0].shape[:2]
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        video_writer = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-
-        for index, image in enumerate(images):
-            await asyncio.sleep(0)
-            self.interface.set_log_state(saving_active=True, progress=(index/len(images)*100))
-            # print(f'saving {(index/len(images)*100):.1f}%')
-            # Ensure the image is in BGR color space (OpenCV default)
-            if len(image.shape) == 2:  # Grayscale
-                image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-            elif image.shape[2] == 3:  # Assuming it's already BGR
-                pass
-            elif image.shape[2] == 4:  # RGBA
-                image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
-            else:
-                raise ValueError(f"Unsupported image shape: {image.shape}")
-            video_writer.write(image)
-
-        video_writer.release()
-        print(f"Video saved to {output_path}")
-        self.interface.set_log_state(saving_active=False)
 
     def start_replay(self, replay):
         self.interface.set_log_state(replay_active=True)

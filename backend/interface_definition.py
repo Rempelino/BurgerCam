@@ -29,7 +29,6 @@ class State:
     PLC_connected: bool = False
     frontend_update_required: bool = False
     logging_active: bool = False
-    saving_active: bool = False
     replay_active: bool = False
     log_progress: float = 0.0
 

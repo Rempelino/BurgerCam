@@ -32,7 +32,7 @@ import versionInfo from '../../version.json';
 export class LiveViewComponent implements DoCheck {
   version: string = versionInfo.version;
   chosen_log: string = ''
-  private previousSaveActive: boolean = false
+  private previousLogActive: boolean = false
 
   constructor(public API: ApiServiceService) {
     API.getSettings();
@@ -43,12 +43,12 @@ export class LiveViewComponent implements DoCheck {
     if (!this.API.dataOK()){
       return;
     }
-    if (this.API.state.saving_active !== this.previousSaveActive) {
-      if (this.previousSaveActive === true && this.API.state.saving_active === false) {
+    if (this.API.state.logging_active !== this.previousLogActive) {
+      if (this.previousLogActive === true && this.API.state.logging_active === false) {
         this.API.getAvailableLogs()
 
       }
-      this.previousSaveActive = this.API.state.saving_active;
+      this.previousLogActive = this.API.state.logging_active;
     }
   }
   startLogging() {

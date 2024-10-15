@@ -4,18 +4,15 @@ from interface import Interface
 from log import Log
 
 
-
-
 class FrameGetter:
     last_frame = None
     frame_counter = 0
     video_active = False
+    cap = None
 
-    def __init__(self, video_path, settings: Interface, log: Log):
+    def __init__(self, settings: Interface, log: Log):
         self.cam = Camera(settings)
         self.log = log
-
-
 
     def get_frame(self):
         if not self.log.replay_active:
@@ -39,4 +36,3 @@ class FrameGetter:
         self.cap = cv2.VideoCapture(self.log.replay_path)
         if self.cap.isOpened():
             self.video_active = True
-
