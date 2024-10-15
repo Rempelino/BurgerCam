@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Exec=/home/henry/BurgerCam/Production/Run.sh
+Exec=/home/ghd/Run.sh
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
@@ -8,3 +8,4 @@ Name[en_US]=BurgerCam
 Name=BurgerCam
 Comment[en_US]=Start BurgerCam services
 Comment=Start BurgerCam services
+Name[de_DE]=BurgerCam.desktop
