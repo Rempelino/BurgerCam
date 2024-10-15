@@ -12,7 +12,7 @@ from frame import Frame
 from interface import Interface, SettingsStructure
 from log import Log
 import logging
-
+from datetime import datetime
 
 class Frontend:
     frame: Frame = None
@@ -79,7 +79,7 @@ class Frontend:
         @self.app.route('/api/start_replay', methods=['POST'])
         def start_replay():
             data = request.get_json()
-            self.log.start_replay(data['replay'])
+            self.log.start_replay(self.convert_datetime_format(data['replay'], to_file_format=True))
             return jsonify({'msg': 'got it'})
 
         @self.app.route('/api/stop_replay')
@@ -91,8 +91,12 @@ class Frontend:
         def get_available_logs():
             if request.method == 'OPTIONS':
                 return '', 200
+            if "Log" not in os.listdir():
+                os.mkdir("Log")
             data = os.listdir('Log')
-            return jsonify(data)
+            data_formatted = [self.convert_datetime_format(x) for x in data]
+
+            return jsonify(data_formatted)
 
         @self.app.route('/api/set_settings', methods=['POST'])
         def set_settings():
@@ -167,7 +171,13 @@ class Frontend:
             existing_param.update(param)
         else:
             self.streams.append(param)
-
+    @staticmethod
+    def convert_datetime_format(input_datetime, to_file_format=False):
+        if to_file_format:
+            dt = datetime.strptime(input_datetime, "%Y.%m.%d %H:%M:%S")
+            return dt.strftime("%Y_%m_%d_%H_%M_%S")
+        dt = datetime.strptime(input_datetime, "%Y_%m_%d_%H_%M_%S")
+        return dt.strftime("%Y.%m.%d %H:%M:%S")
 
 if __name__ == "__main__":
     myFrontend = Frontend()

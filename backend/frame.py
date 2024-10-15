@@ -27,7 +27,7 @@ class Frame:
 
     def __init__(self, frame, settings: SettingsStructure, lines):
         self.settings = settings
-        self.frame = frame#[interface.frame_cutout.min:interface.frame_cutout.max, :]
+        self.frame = frame
         time_debug.print_time("cutout frame")
         if self.resize:
             height, width, _ = self.frame.shape
@@ -36,8 +36,6 @@ class Frame:
             if self.frame_width > 4096:
                 self.frame_width = 4096
             self.frame = cv2.resize(self.frame, (self.frame_width, self.frame_height))
-        # cv2.imshow("TEST", self.frame)
-        # key = cv2.waitKey(0)
         self.frame_height, self.frame_width, _ = self.frame.shape
 
         self.min_color = np.array([settings.colourFilter.hue.min,

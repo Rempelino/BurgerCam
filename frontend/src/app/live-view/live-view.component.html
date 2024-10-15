@@ -19,14 +19,14 @@
         <mat-card-title>Logging</mat-card-title>
         <mat-card-content>
             <div class="logging-controls">
-                <button mat-raised-button (click)="startLogging()" [disabled]="API.state.logging_active">
+                <button mat-raised-button (click)="startLogging()">
                     {{ API.state.logging_active ? 'Logging...' : 'Start Logging' }}
                 </button>
                 <!--mat-progress-bar *ngIf="API.state.logging_active" mode="determinate"
                 [value]="API.state.log_progress"></mat-progress-bar-->
 
                 <button mat-raised-button (click)="toggleReplay()"
-                    [disabled]="chosen_log == '' && !API.state.replay_active">
+                    [disabled]="chosen_log == ''">
                     {{ API.state.replay_active ? 'Stop Replay' : 'Start Replay' }}
                 </button>
 
