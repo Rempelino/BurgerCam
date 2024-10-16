@@ -73,4 +73,4 @@ fi
 
 nmcli device connect eth0
 nmcli radio wifi on
-cd ~/BurgerCam/backend && venv/bin/python main.py
+cd ~/BurgerCam/backend && sudo venv/bin/python main.py
