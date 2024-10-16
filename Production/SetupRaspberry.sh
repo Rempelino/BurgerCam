@@ -56,38 +56,65 @@ fi
 echo "---------------------------------------------------------------------------"
 echo "---------------------------Updating pakage list----------------------------"
 echo "---------------------------------------------------------------------------"
-sudo apt-get update
+#sudo apt-get update
 
 echo "---------------------------------------------------------------------------"
 echo "---------------------------Downloading Project from github-----------------"
 echo "---------------------------------------------------------------------------"
-sudo rm -rf BurgerCam
-git clone https://github.com/Rempelino/BurgerCam.git
+#sudo rm -rf BurgerCam
+#git clone https://github.com/Rempelino/BurgerCam.git
 
 echo "---------------------------------------------------------------------------"
 echo "---------------------------creating virtual enviroment---------------------"
 echo "---------------------------------------------------------------------------"
-cd ~/BurgerCam/backend/ && python3 -m venv venv
+#cd ~/BurgerCam/backend/ && python3 -m venv venv
 
 echo "---------------------------------------------------------------------------"
 echo "---------------------------downloading python pakages----------------------"
 echo "---------------------------------------------------------------------------"
-cd ~/BurgerCam/backend && source venv/bin/activate && pip install -r requirements.txt
+#cd ~/BurgerCam/backend && source venv/bin/activate && pip install -r requirements.txt
 
 echo "---------------------------------------------------------------------------"
 echo "---------------------------installing npm----------------------------------"
 echo "---------------------------------------------------------------------------"
-sudo apt install nodejs npm
+#sudo apt install nodejs npm
 
 echo "---------------------------------------------------------------------------"
 echo "---------------------------installing pakages------------------------------"
 echo "---------------------------------------------------------------------------"
-cd ~/BurgerCam/frontend && npm install
+#cd ~/BurgerCam/frontend && npm install
 
 echo "---------------------------------------------------------------------------"
 echo "---------------------------building frontend-------------------------------"
 echo "---------------------------------------------------------------------------"
 cd ~/BurgerCam/frontend && npm run build
+# Check if the build was successful
+if [ $? -eq 0 ]; then
+    echo "Frontend build successful. Moving dist folder..."
+    # Replace '/path/to/destination' with the actual path where you want to move the dist folder
+    mv ~/BurgerCam/frontend/dist ~/BurgerCam/Production/frontend
+    
+    # Check if the move was successful
+    if [ $? -eq 0 ]; then
+        echo "Successfully moved dist folder to the destination."
+    else
+        echo "Failed to move dist folder. Please check permissions and paths."
+    fi
+else
+    echo "Frontend build failed. Dist folder will not be moved."
+fi
+
+
+
+
+nmcli device connect eth0
+nmcli radio wifi on
+
+echo 'Process finished. Press any key to reboot the pi'
+read -n 1 -s -r -p ''
+
+
+
 
 echo "---------------------------------------------------------------------------"
 echo "---------------------------setting up autostart procedure------------------"

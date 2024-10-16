@@ -24,7 +24,7 @@ class Frontend:
         logger.setLevel(logging.WARNING)
         self.settings: Interface = settings
         self.is_connected = False
-        self.app = Flask(__name__, static_folder='../frontend/dist/frontend_new/browser')
+        self.app = Flask(__name__, static_folder='../Production/frontend/browser')
         CORS(self.app)
         self.run_video = True
         self.define_routes()
