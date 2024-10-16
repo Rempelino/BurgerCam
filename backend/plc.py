@@ -66,7 +66,7 @@ class PLC:
             case MessageType.STATE_SET:
                 self.settings.plc_state_update_request_flag = False
                 data = self.settings.get_state(as_byte_stream=True)
-                print("state has been send to PLC")
+                # print("state has been send to PLC")
 
         data = bytes([self.send_command.value]) + data
 
