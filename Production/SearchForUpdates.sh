@@ -1,12 +1,12 @@
 #!/bin/bash
 # Define functions
 check_internet() {
-    ping -c 1 -W 2 8.8.8.8 > /dev/null 2>&1
+    ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1
 }
 try_connection() {
     local interface=$1
     local timeout=30
-    local endtime=$(( $(date +%s) + timeout ))
+    local endtime=$(($(date +%s) + timeout))
     local connected=false
     echo "Trying to connect using $interface..."
     while [ $(date +%s) -lt $endtime ]; do
@@ -34,7 +34,7 @@ else
     nmcli device disconnect eth0
     echo 'Turning on WiFi...'
     nmcli radio wifi on
-    
+
     if try_connection "WiFi"; then
         echo "Using WiFi connection"
     else
@@ -45,36 +45,28 @@ fi
 # Attempt to update and build only if we have an internet connection
 if check_internet; then
     echo "Checking for updates..."
-    git fetch
-    if [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]; then
+    cd ~/BurgerCam && git fetch
+    if [ $(cd ~/BurgerCam && git rev-parse HEAD) != $(cd ~/BurgerCam && git rev-parse @{u}) ]; then
         echo "Updates found. Pulling changes..."
-        git reset --hard
-        git pull
-	
-	nmcli device connect eth0
-	nmcli radio wifi off
-
+        cd ~/BurgerCam && git reset --hard
+        cd ~/BurgerCam && git pull
         echo "Changes pulled. Building frontend..."
-        cd frontend
+        sudo rm -rf ~/BurgerCam/Production/frontend
+        cd ~/BurgerCam/frontend && npm run build
+        # Check if the build was successful
+        if [ $? -eq 0 ]; then
+            echo "Frontend build successful. Moving dist folder..."
+            # mv ~/BurgerCam/frontend/dist/frontend ~/BurgerCam/Production
 
-	sudo rm -rf ~/BurgerCam/Production/frontend
-        npm run build
-	# Check if the build was successful
-	if [ $? -eq 0 ]; then
-    		echo "Frontend build successful. Moving dist folder..."
-    		# mv ~/BurgerCam/frontend/dist/frontend ~/BurgerCam/Production
-    
-    		# Check if the move was successful
-    		if [ $? -eq 0 ]; then
-        		echo "Successfully moved dist folder to the destination."
-    		else
-        		echo "Failed to move dist folder. Please check permissions and paths."
-    		fi
-	else
-    		echo "Frontend build failed. Dist folder will not be moved."
-	fi
-
-
+            # Check if the move was successful
+            if [ $? -eq 0 ]; then
+                echo "Successfully moved dist folder to the destination."
+            else
+                echo "Failed to move dist folder. Please check permissions and paths."
+            fi
+        else
+            echo "Frontend build failed. Dist folder will not be moved."
+        fi
 
     else
         echo "No updates found. Skipping build."
