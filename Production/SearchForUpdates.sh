@@ -78,4 +78,10 @@ fi
 echo "Enabling Ethernet and disabling WiFi..."
 nmcli device connect eth0
 nmcli radio wifi off
+
+# make scripts executable just in case
+chmod +x ~/BurgerCam/Production/Run.sh
+chmod +x ~/BurgerCam/Production/SearchForUpdates.sh
+chmod +x ~/BurgerCam/Production/RunBurgerCam.sh
+
 echo "Ethernet enabled and WiFi disabled."
