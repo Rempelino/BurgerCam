@@ -44,7 +44,7 @@ class Frontend:
         flask_thread.start()
 
     def run_flask(self):
-        self.app.run(debug=False, threaded=True, port=8080, host='0.0.0.0')
+        self.app.run(debug=False, threaded=True, port=80, host='0.0.0.0')
 
     def define_routes(self):
         # Serve Angular app
