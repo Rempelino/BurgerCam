@@ -56,7 +56,7 @@ if check_internet; then
         # Check if the build was successful
         if [ $? -eq 0 ]; then
             echo "Frontend build successful. Moving dist folder..."
-            # mv ~/BurgerCam/frontend/dist/frontend ~/BurgerCam/Production
+            mv ~/BurgerCam/frontend/dist/frontend ~/BurgerCam/Production
 
             # Check if the move was successful
             if [ $? -eq 0 ]; then
