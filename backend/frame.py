@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-
 import time_debug
 from interface import SettingsStructure
 
@@ -26,6 +25,7 @@ class Frame:
     resize = True
 
     def __init__(self, frame, settings: SettingsStructure, lines):
+        self.brightness = 50
         self.settings = settings
         self.frame = frame# [settings.cam_settings.frame_cutout.min:settings.cam_settings.frame_cutout.max, :]
         time_debug.print_time("cutout frame")
@@ -36,6 +36,10 @@ class Frame:
             if self.frame_width > 4096:
                 self.frame_width = 4096
             self.frame = cv2.resize(self.frame, (self.frame_width, self.frame_height))
+
+        self.frame = self.remove_fisheye(image=self.frame, strength=settings.fisheye/10)
+        self.calculate_brightness()
+
         self.frame_height, self.frame_width, _ = self.frame.shape
 
         self.min_color = np.array([settings.colourFilter.hue.min,
@@ -67,6 +71,28 @@ class Frame:
             return self.get_frame_pixel_sums(with_rows=with_rows)
         print(f"Filter {filter} does not exist")
         return self.frame.copy()
+
+    def calculate_brightness(self):
+        """
+        Calculate the overall brightness of an image represented as a numpy array.
+
+        Parameters:
+        image (numpy.ndarray): Image array with values in range [0, 255]
+            Can be grayscale (2D) or RGB/RGBA (3D)
+
+        Returns:
+        float: Average brightness value between 0 (darkest) and 255 (brightest)
+        """
+        # Handle different image formats
+        if len(self.frame.shape) == 3:  # RGB/RGBA image
+            # Convert to grayscale using standard weights
+            # Uses ITU-R BT.601 conversion formula: Y = 0.299 R + 0.587 G + 0.114 B
+            grayscale = np.dot(self.frame[..., :3], [0.299, 0.587, 0.114])
+        else:  # Already grayscale
+            grayscale = self.frame
+
+        # Calculate mean brightness
+        self.brightness = np.mean(grayscale)
 
     def get_frame_monochrom(self):
         if self.frame_monochrom is not None:
@@ -110,7 +136,60 @@ class Frame:
 
         self.frame_filtered_2 = np.transpose(output)
         time_debug.print_time("applied filter 2")
+
         return self.frame_filtered_2
+
+    @staticmethod
+    def remove_fisheye(image, strength=2.0):
+        """
+        Remove fisheye distortion from an image using a simple radial distortion model.
+
+        Parameters:
+        image (numpy.ndarray): Input image in numpy array format
+        strength (float): Distortion correction strength (default 2.0)
+                         Values between 1.5 and 3.0 usually work best
+
+        Returns:
+        numpy.ndarray: Corrected image without fisheye distortion
+        """
+        if strength == 0:
+            return image
+
+        # Get image dimensions
+        height, width = image.shape[:2]
+        center_x = width / 2
+        center_y = height / 2
+
+        # Create coordinate maps
+        y, x = np.indices((height, width))
+
+        # Calculate distance from center
+        dx = (x - center_x) / center_x
+        dy = (y - center_y) / center_y
+        r = np.sqrt(dx ** 2 + dy ** 2)
+
+        # Apply distortion correction
+        # Using a modified equation that better preserves the image
+        r_new = (1 / r) * np.arctan(r * strength) / strength
+
+        # Handle the center point to avoid division by zero
+        r_new[r == 0] = 1
+
+        # Calculate new coordinates
+        x_new = dx * r_new
+        y_new = dy * r_new
+
+        # Scale back to image coordinates
+        x_new = (x_new * center_x + center_x).astype(np.float32)
+        y_new = (y_new * center_y + center_y).astype(np.float32)
+
+        # Apply the correction using cv2.remap
+        corrected_image = cv2.remap(image, x_new, y_new,
+                                    interpolation=cv2.INTER_LINEAR,
+                                    borderMode=cv2.BORDER_CONSTANT,
+                                    borderValue=(0, 0, 0))
+
+        return corrected_image
 
     def get_frame_pixel_sums(self, with_rows=False):
         new_frame = np.zeros([self.frame_height, self.frame_width, 3], dtype=np.uint8)
@@ -136,8 +215,8 @@ class Frame:
             new_line = np.zeros((5, self.frame_width, 3))
             new_line[:, :] = self.red
             y = line[0]
-            start = max(0, y - 2)
-            end = min(self.frame_height, y + 3)
+            start = max(0, y-1)
+            end = min(self.frame_height, y + 1)
             new_frame[start:end] = new_line[:end - start]
         return new_frame
 
@@ -158,18 +237,32 @@ class Frame:
     def overlay_number(self, frame):
         if self.lines is None:
             return frame
-        thickness = 2
-        color = (255, 255, 255)
-        font_scale = 1
-        # Convert the number to string
 
-        # Define the font
+        thickness = 2
+        font_scale = 1
         font = cv2.FONT_HERSHEY_SIMPLEX
 
-        # Put the text on the image
+        # Colors
+        red = (255, 100, 100)  # BGR format - Red for index
+        white = (255, 255, 255)  # BGR format - White for value
+
         for index, line in enumerate(self.lines):
-            text = f'{index + 1}:{int(line[1])}%'
-            cv2.putText(frame, text, [0, line[0]], font, font_scale, color, thickness, cv2.LINE_AA)
+            # Split the text into two parts
+            index_text = f'{index + 1}:'
+            value_text = f'{int(line[1])}%'
+
+            # Get the size of the index text to know where to start the value
+            (index_width, _), _ = cv2.getTextSize(index_text, font, font_scale, thickness)
+
+            # Position for the texts
+            pos = [0, line[0]]
+
+            # Draw index in red
+            cv2.putText(frame, index_text, pos, font, font_scale, red, thickness, cv2.LINE_AA)
+
+            # Draw value in white, starting after the index
+            pos[0] += index_width
+            cv2.putText(frame, value_text, pos, font, font_scale, white, thickness, cv2.LINE_AA)
 
         return frame
 

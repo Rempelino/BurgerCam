@@ -79,6 +79,13 @@ class Camera:
         # turn on the stream
         self.cam.stream_on()
 
+    def update_exposure(self):
+        settings: CamSettings = self.settings.get_cam_settings()
+        settings = self.validate_settings(settings)
+        self.cam.ExposureTime.set(settings.ExposureTime)
+        self.settings.cam_exposure_update_flag = False
+        self.last_written_settings.ExposureTime = settings.ExposureTime
+
     @staticmethod
     def validate_settings(settings: CamSettings):
         if settings.ExposureTime > 1000000.0:
@@ -114,8 +121,10 @@ class Camera:
             return None
 
         if self.settings.cam_update_request_flag:
-
             self.write_settings()
+
+        if self.settings.cam_exposure_update_flag:
+            self.update_exposure()
 
         raw_image = self.cam.data_stream[0].get_image()
         self.send_acquisition_command()

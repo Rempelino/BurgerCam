@@ -30,6 +30,13 @@ class Imaging:
             self.line_finder.update(frame.get_frame_collapsed(), self.settings.settings.lines)
             time_debug.print_time("lines updated")
             self.plc.send_line_values(self.line_finder.get_line_values())
+
+            # adjust brightness
+            requested_brightness = 70
+            if frame.brightness < requested_brightness - 2 or frame.brightness > requested_brightness + 2:
+                if not self.settings.state.replay_active:
+                    self.settings.adjust_exposure(int(requested_brightness - frame.brightness))
+
         self.frontend.update_frame(frame)
         time_debug.print_time("imaging done")
 

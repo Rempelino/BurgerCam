@@ -12,6 +12,7 @@ class Interface:
     plc_state_update_request_flag = False
     cam_update_request_flag = False
     plc_settings_download_request_flag = False
+    cam_exposure_update_flag = False
 
     def __init__(self):
         try:
@@ -164,6 +165,11 @@ class Interface:
         self.state.logging_active = logging_active
         self.state.replay_active = replay_active
         self.state.log_progress = progress
+
+    def adjust_exposure(self, value):
+        self.settings.cam_settings.ExposureTime += value * 100
+        self.cam_exposure_update_flag = True
+        self.state.frontend_update_required = True
 
 def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))
