@@ -1,6 +1,8 @@
 import asyncio
 import time_debug
 from interface import MessageType
+from time import sleep
+import time
 
 
 class PLC:
@@ -9,6 +11,9 @@ class PLC:
     received_byte_string = None
     send_command: MessageType = MessageType.SETTINGS_GET
     connection_process_active = False
+    state_update_interval = 100
+    current_interval = 50
+
 
     def __init__(self, host, port, settings):
         self.host = host
@@ -62,18 +67,25 @@ class PLC:
             case MessageType.SETTINGS_SET:
                 self.settings.plc_settings_update_request_flag = False
                 data = self.settings.get_settings(as_byte_stream=True)
-                print("requesting interface")
             case MessageType.STATE_SET:
                 self.settings.plc_state_update_request_flag = False
                 data = self.settings.get_state(as_byte_stream=True)
-                # print("state has been send to PLC")
+                sleep(0.1) # to make sure protocols dont mix
+                #print("sending state update")
 
         data = bytes([self.send_command.value]) + data
 
         try:
+            #print(data)
             self.writer.write(data)
             await self.writer.drain()
+            #sleep(1)
             self.send_command = MessageType.IDLE
+
+            self.current_interval = self.current_interval + 1
+            if self.current_interval > self.state_update_interval:
+                self.current_interval = 0
+                self.settings.plc_state_update_request_flag = True
 
         except Exception as e:
             print(f'Exception while sending: {e} -> closing connection to PLC')
