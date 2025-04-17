@@ -108,6 +108,7 @@ class Frame:
             return self.frame_filtered_1
 
         frame = self.get_frame_monochrom()
+        frame = np.transpose(frame)
         output = np.zeros_like(frame, dtype=np.uint8)
         for row in range(frame.shape[0]):
             diff = np.diff(frame[row], prepend=0, append=0)
@@ -117,14 +118,16 @@ class Frame:
             for start, end in valid_runs:
                 output[row, start:end] = 255
 
-        self.frame_filtered_1 = output
+        # self.frame_filtered_1 = output
+        self.frame_filtered_1 = np.transpose(output)
         time_debug.print_time("applied filter 1")
         return self.frame_filtered_1
 
     def get_frame_filtered_2(self):
         if self.frame_filtered_2 is not None:
             return self.frame_filtered_2
-        frame = np.transpose(self.get_frame_filtered_1())
+        # frame = np.transpose(self.get_frame_filtered_1())
+        frame = self.get_frame_filtered_1()
         output = np.zeros_like(frame, dtype=np.uint8)
         for row in range(frame.shape[0]):
             diff = np.diff(frame[row], prepend=0, append=0)
@@ -134,7 +137,8 @@ class Frame:
             for start, end in valid_runs:
                 output[row, start:end] = 255
 
-        self.frame_filtered_2 = np.transpose(output)
+        # self.frame_filtered_2 = np.transpose(output)
+        self.frame_filtered_2 = output
         time_debug.print_time("applied filter 2")
 
         return self.frame_filtered_2

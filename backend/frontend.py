@@ -91,9 +91,9 @@ class Frontend:
         def get_available_logs():
             if request.method == 'OPTIONS':
                 return '', 200
-            if "Log" not in os.listdir():
-                os.mkdir("Log")
-            data = os.listdir('Log')
+            if "log" not in os.listdir():
+                os.mkdir("log")
+            data = os.listdir('log')
             data_formatted = [self.convert_datetime_format(x) for x in data]
 
             return jsonify(data_formatted)

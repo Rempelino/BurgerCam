@@ -10,6 +10,6 @@ run_in_terminal() {
     "
 }
 run_in_terminal "Burger Cam" "
-~/BurgerCam/Production/SearchForUpdates.sh
+# ~/BurgerCam/Production/SearchForUpdates.sh
 ~/BurgerCam/Production/RunBurgerCam.sh
 "

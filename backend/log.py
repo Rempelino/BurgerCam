@@ -30,7 +30,7 @@ class Log:
 
         if self.video_writer is None:
             fps = 20
-            output_path = f'Log/{self.time_stamp}/video.mp4'
+            output_path = f'log/{self.time_stamp}/video.mp4'
             height, width = frame.shape[:2]
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')
             self.video_writer = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
@@ -48,7 +48,7 @@ class Log:
 
 
         if datetime.now() - self.start_time > self.log_time:
-            output_path = f'Log/{self.time_stamp}/video.mp4'
+            output_path = f'log/{self.time_stamp}/video.mp4'
             self.video_writer.release()
             self.video_writer = None
             print(f"Video saved to {output_path}")
@@ -69,20 +69,20 @@ class Log:
 
         # Create the directory
         try:
-            os.mkdir(f'Log/{self.time_stamp}')
+            os.mkdir(f'log/{self.time_stamp}')
         except FileExistsError:
             print(f"Directory '{self.time_stamp}' already exists.")
         except PermissionError:
             print("Permission denied: Unable to create directory.")
         except Exception as e:
             print(f"An error occurred: {e}")
-        write_dataclass_to_file(self.interface.get_settings(), f'Log/{self.time_stamp}/settings.pkl')
+        write_dataclass_to_file(self.interface.get_settings(), f'log/{self.time_stamp}/settings.pkl')
 
     def start_replay(self, replay):
         self.interface.set_log_state(replay_active=True)
         self.replay_active = True
         self.replay_path = 'log/' + replay + '/video.mp4'
-        self.interface.set_settings(read_dataclass_from_file(SettingsStructure, f'Log/{replay}/settings.pkl'))
+        self.interface.set_settings(read_dataclass_from_file(SettingsStructure, f'log/{replay}/settings.pkl'))
         print(self.replay_path)
 
     def stop_replay(self):
@@ -92,7 +92,7 @@ class Log:
 
     @staticmethod
     def remove_old_logs():
-        log_dir = Path('Log')
+        log_dir = Path('log')
         if not log_dir.exists() or not log_dir.is_dir():
             print("Log directory does not exist.")
             return
